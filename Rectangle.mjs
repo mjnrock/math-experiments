@@ -20,6 +20,14 @@ export default class Rectangle {
             [ this.X + this.Width, this.Y + this.Height ],
         ]
     };
+    GetSides() {
+        return [
+            [ this.X, this.Y, this.X + this.Width, this.Y ],
+            [ this.X + this.Width, this.Y, this.X + this.Width, this.Y + this.Height ],
+            [ this.X + this.Width, this.Y + this.Height, this.X, this.Y + this.Height ],
+            [ this.X, this.Y + this.Height, this.X, this.Y ],
+        ];
+    };
 
     GetBoundingBox() {
         return {

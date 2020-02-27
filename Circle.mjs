@@ -31,6 +31,10 @@ export default class Circle {
         };
     }
 
+    IsWithinCircle(x, y) {
+        return Math.hypot(x - this.X, y - this.Y) <= this.Radius;
+    }
+
     IsCollision(circle) {
         let result = Math.hypot(circle.X - this.X, circle.Y - this.Y) <= (this.Radius + circle.Radius);
 
