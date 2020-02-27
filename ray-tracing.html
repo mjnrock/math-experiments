@@ -28,9 +28,9 @@
                         GrowthFactor: 5,
                         MaxSize: 250
                     },
-                    Rectangle: {
-                        Width: 50,
-                        Height: 50
+                    Circadian: {
+                        Time: 0,
+                        MaxTime: 1440 * 2
                     }
                 },
                 Loop: {
@@ -72,7 +72,10 @@
                 ctx.clearRect(0, 0, Canvas.width, Canvas.height);
 
                 // Draw the entire world dark
-                ctx.globalAlpha = 0.8;
+                let rat = Physics.Config.Circadian.Time / Physics.Config.Circadian.MaxTime * 2 * Math.PI;
+                // let alpha = (1 / 10 * Math.cos(rat)) + (9 / 10);
+                let alpha = (1 / 2 * Math.cos(rat)) + (1 / 2);
+                ctx.globalAlpha = alpha.toFixed(2);
                 ctx.fillStyle = "#000";
                 ctx.fillRect(
                     0, 0, Canvas.width, Canvas.height
@@ -133,8 +136,22 @@
 
                     // Make the SubjectVision bubble follow the Subject
                     Physics.SubjectVision.X = Physics.Subject.X;
-                    Physics.SubjectVision.Y = Physics.Subject.Y;
+                    Physics.SubjectVision.Y = Physics.Subject.Y;                    
 
+                
+                    // Draw text of "Time / Max | Alpha"
+                    let rat = Physics.Config.Circadian.Time / Physics.Config.Circadian.MaxTime * 2 * Math.PI;
+                    let alpha = (1 / 2 * Math.cos(rat)) + (1 / 2);
+                    let text = `${ Physics.Config.Circadian.Time % Physics.Config.Circadian.MaxTime } / ${ Physics.Config.Circadian.MaxTime } | ${ alpha.toFixed(2) }`;
+                    let tlen = ctx.measureText(text).width;
+                    ctx.fillStyle = "#FFF";
+                    ctx.clearRect((Canvas.width / 2) - (tlen / 2) - 5, 0, tlen + 10, 10 + 4);
+                    ctx.fillStyle = "#000";
+                    ctx.font = `8pt monospace`;
+                    ctx.textAlign = "center";
+                    ctx.fillText(text, (Canvas.width / 2), 10);
+
+                    Physics.Config.Circadian.Time += 1;
                     Physics.Loop.LastTick = now;
                 }
             };
