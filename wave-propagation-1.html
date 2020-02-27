@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tachyons/4.11.1/tachyons.min.css" integrity="sha256-XiJ+PedljEmPP2VaQzSzekfCZdPr0fpqmh9dY6kpsuQ=" crossorigin="anonymous" />
+
+        <title>Wave Propagation</title>
+    </head>
+    <body>
+        <div>
+            <canvas id="main" class="ba br2"></canvas>
+        </div>
+        <button id="play-pause">Pause/Resume</button>
+
+        <pre id="code" class="ma4"></pre>
+
+        <script type="module">
+            import Circle from "./Circle.mjs";
+
+            const Physics = {
+                Run: true,
+                Config: {
+                    Size: 5,
+                    GrowthFactor: 5,
+                    MaxSize: 250
+                },
+                Loop: {
+                    FPS: 24,
+                    Interval: 0,
+                    LastTick: 0
+                },
+                Shapes: []
+            };
+
+            const Canvas = document.getElementById("main");
+            const ctx = Canvas.getContext("2d");
+
+            window.onresize = e => {
+                ResizeCanvas();
+            };
+
+            function ResizeCanvas() {
+                ctx.canvas.width  = window.innerWidth - 25;
+                ctx.canvas.height = window.innerHeight - 25;
+            }
+            ResizeCanvas();
+
+            function GetCanvasPosition(e) {
+                const rect = Canvas.getBoundingClientRect();
+
+                return {
+                    x: e.clientX - rect.left,
+                    y: e.clientY - rect.top
+                };
+            }
+
+            function Draw() {
+                ctx.clearRect(0, 0, Canvas.width, Canvas.height);
+
+                Physics.Shapes.forEach(s => {
+                    DrawCircle(s);
+                });
+            }
+
+            function getRandomColor() {
+                let letters = "0123456789ABCDEF";
+                let color = "#";
+
+                for (let i = 0; i < 6; i++) {
+                    color += letters[ Math.floor(Math.random() * 16) ];
+                }
+
+                return color;
+            }
+            
+            function DrawCircle(circle) {
+                ctx.strokeStyle = circle.Color;
+                ctx.beginPath();
+                ctx.arc(circle.X, circle.Y, circle.Radius, 0, 2 * Math.PI);
+                ctx.stroke(); 
+                // ctx.fillText(circle.NoOfCollisions, circle.X, circle.Y);
+            }
+
+            function onTick() {
+                if(Physics.Run === true) {
+                    let now = Date.now(),
+                        d = now - Physics.Loop.LastTick;
+
+                    let [ W, H ] = [ Canvas.width, Canvas.height ];
+
+                    Physics.Shapes = Physics.Shapes.filter(s => {
+                        s.Radius += Physics.Config.GrowthFactor;
+
+                        return s.Radius < Physics.Config.MaxSize;
+                    });
+
+                    Physics.Shapes.forEach(circle => {
+                        Physics.Shapes.forEach(c => {
+                            if(circle !== c && !circle.HasCollided(c)) {
+                                if(circle.IsCollision(c) === true) {
+                                    c.Color = "#AA4444";
+                                }
+                            }
+                        });
+                    });
+
+                    // if(Math.random() > 0.1) {
+                    //     for(let i = 0; i < ~~(Math.random() * 3); i++) {
+                    //         Physics.Shapes.push(new Circle(
+                    //             ~~(Math.random() * Canvas.width - Physics.Config.Size) + ((Physics.Config.Size / 2) + 1),
+                    //             ~~(Math.random() * Canvas.height - Physics.Config.Size) + ((Physics.Config.Size / 2) + 1),
+
+                    //             Physics.Config.Size
+                    //         ));
+                    //     }
+                    // }
+
+                    Draw();
+
+                    Physics.Loop.LastTick = now;
+                }
+            };
+
+            for(let i = 0; i < 5; i++) {
+                Physics.Shapes.push(new Circle(
+                    ~~(Math.random() * Canvas.width - Physics.Config.Size) + ((Physics.Config.Size / 2) + 1),
+                    ~~(Math.random() * Canvas.height - Physics.Config.Size) + ((Physics.Config.Size / 2) + 1),
+
+                    Physics.Config.Size
+                ));
+            }
+
+            Physics.Loop.Interval = setInterval(
+                onTick,
+                1000 / Physics.Loop.FPS
+            );
+
+            function AddCircleAtMouse(e) {
+                let { x, y } = GetCanvasPosition(e);
+                
+                Physics.Shapes.push(new Circle(
+                    x,
+                    y,
+
+                    Physics.Config.Size
+                ));
+            }
+
+            Canvas.onmousemove = e => {
+                if(e.shiftKey) {
+                    AddCircleAtMouse(e);
+                }
+            }
+            Canvas.onclick = AddCircleAtMouse;
+
+            document.getElementById("play-pause").onclick = () => Physics.Run = !Physics.Run;
+        </script>
+    </body>
+</html>

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tachyons/4.11.1/tachyons.min.css" integrity="sha256-XiJ+PedljEmPP2VaQzSzekfCZdPr0fpqmh9dY6kpsuQ=" crossorigin="anonymous" />
+
+        <title>Ray Tracing (Endpoint Analysis)</title>
+    </head>
+    <body>
+        <div>
+            <canvas id="main" class="ba br2"></canvas>
+        </div>
+        <button id="play-pause">Pause/Resume</button>
+
+        <pre id="code" class="ma4"></pre>
+
+        <script type="module">
+            import Circle from "./Circle.mjs";
+            import Rectangle from "./Rectangle.mjs";
+
+            const Physics = {
+                Run: true,
+                Config: {
+                    Circle: {
+                        Size: 5,
+                        GrowthFactor: 5,
+                        MaxSize: 250
+                    },
+                    Rectangle: {
+                        Width: 50,
+                        Height: 50
+                    }
+                },
+                Loop: {
+                    FPS: 24,
+                    Interval: 0,
+                    LastTick: 0
+                },
+                Subject: null,
+                SubjectVision: null,
+                VisionRange: 350,
+                Shapes: []
+            };
+
+            const Canvas = document.getElementById("main");
+            const ctx = Canvas.getContext("2d");
+
+            window.onresize = e => {
+                ResizeCanvas();
+            };
+
+            function ResizeCanvas() {
+                ctx.canvas.width  = 1000;
+                ctx.canvas.height = 900;
+                // ctx.canvas.width  = window.innerWidth - 25;
+                // ctx.canvas.height = window.innerHeight - 25;
+            }
+            ResizeCanvas();
+
+            function GetCanvasPosition(e) {
+                const rect = Canvas.getBoundingClientRect();
+
+                return {
+                    x: e.clientX - rect.left,
+                    y: e.clientY - rect.top
+                };
+            }
+
+            function Draw() {
+                ctx.clearRect(0, 0, Canvas.width, Canvas.height);
+
+                // Draw the entire world dark
+                ctx.globalAlpha = 0.8;
+                ctx.fillStyle = "#000";
+                ctx.fillRect(
+                    0, 0, Canvas.width, Canvas.height
+                );
+                    // Reset the "darkness" back to light
+                ctx.globalAlpha = 1.0;
+
+                // Draw the SubjectVision bubble first so that everything within it is visible
+                DrawCircle(Physics.SubjectVision);
+                // Draw subject
+                DrawCircle(Physics.Subject);
+                // Iterate the shapes on the map
+                Physics.Shapes.forEach(s => {
+                    DrawShape(s);
+                });
+            }
+
+            function DrawShape(shape) {
+                if(shape instanceof Circle) {
+                    DrawCircle(shape);
+                } else if(shape instanceof Rectangle) {
+                    DrawRectangle(shape);
+                }
+            }
+
+            function DrawCircle(circle) {
+                ctx.strokeStyle = circle.Color;
+                ctx.beginPath();
+                ctx.arc(circle.X, circle.Y, circle.Radius, 0, 2 * Math.PI);
+
+                if(circle === Physics.SubjectVision) {
+                    // Make the background of the SubjectVision bubble white so that everything else shows up
+                    ctx.fillStyle = "#FFF";
+                    ctx.fill();
+                    ctx.stroke();
+                } else {
+                    ctx.stroke();
+                }
+            }
+            function DrawRectangle(rect) {
+                ctx.strokeStyle = "#000";
+                ctx.strokeRect(
+                    rect.X, rect.Y,
+                    rect.Width, rect.Height
+                );
+            }
+
+            function onTick() {
+                if(Physics.Run === true) {
+                    let now = Date.now(),
+                        d = now - Physics.Loop.LastTick;
+
+                    let [ W, H ] = [ Canvas.width, Canvas.height ];
+
+                    Draw();
+
+                    RayTrace();
+
+                    // Make the SubjectVision bubble follow the Subject
+                    Physics.SubjectVision.X = Physics.Subject.X;
+                    Physics.SubjectVision.Y = Physics.Subject.Y;
+
+                    Physics.Loop.LastTick = now;
+                }
+            };
+
+            Physics.Subject = new Circle(
+                Canvas.width / 2,
+                Canvas.height / 2,
+                25
+            );
+            Physics.SubjectVision = new Circle(
+                Canvas.width / 2,
+                Canvas.height / 2,
+                Physics.VisionRange
+            );
+            for(let i = 0; i < 5; i++) {
+                Physics.Shapes.push(new Rectangle(
+                    ~~(Math.random() * Canvas.width - 100),
+                    ~~(Math.random() * Canvas.height - 75),
+
+                    ~~(Math.random() * 50 + 50),
+                    ~~(Math.random() * 50 + 25),
+                ));
+            }
+
+            Physics.Loop.Interval = setInterval(
+                onTick,
+                1000 / Physics.Loop.FPS
+            );
+
+            document.getElementById("play-pause").onclick = () => Physics.Run = !Physics.Run;
+
+            console.log(Physics);
+
+
+            function GetAllEndpoints() {
+                let endpoints = [
+                    [ 0, 0 ],
+                    [ Canvas.width, 0 ],
+                    [ 0, Canvas.height ],
+                    [ Canvas.width, Canvas.height ],
+                ];
+
+                // Gets the points of all four corners of a rectangle
+                Physics.Shapes.forEach(s => {
+                    if(s instanceof Rectangle) {
+                        endpoints = [
+                            ...endpoints,
+                            ...s.GetEndpoints()
+                        ];
+                    }
+                });
+
+                return endpoints;
+            }
+            function RayTrace() {
+                let endpoints = GetAllEndpoints();
+
+                endpoints.forEach(([ x, y ]) => {
+                    // Draw the ray lines from the center of Subject to the endpoint
+                    ctx.strokeStyle = "#e5b63d";
+                    ctx.beginPath();
+                    ctx.moveTo(Physics.Subject.X, Physics.Subject.Y);
+                    ctx.lineTo(x, y);
+                    ctx.stroke(); 
+                });
+            }
+
+            Canvas.onmousemove = e => {
+                if(e.shiftKey) {
+                    // Set the position of the subject
+                    let { x, y } = GetCanvasPosition(e);
+
+                    Physics.Subject.X = x;
+                    Physics.Subject.Y = y;
+                }
+            }
+
+
+
+            // function RayTrace() {
+            //     let sub = Physics.Subject,
+            //         xs = Physics.Subject.X,
+            //         ys = Physics.Subject.Y,
+            //         rs = Physics.Subject.Radius,
+            //         obstacles = Physics.Shapes;
+
+            //     for(let theta = 0; theta < 2 * Math.PI; theta += 0.01) {
+            //         // Convert polar coordinates to X,Y
+            //         let xr = rs * Math.cos(theta),
+            //             yr = rs * Math.sin(theta);
+
+            //         // Invert Y-axis to compensate for Unit Circle Y direction and Canvas Y direction
+            //         yr = -yr;
+                    
+            //         // Add the Subject's offset to get xr|yr relative to Grid
+            //         let xrs = xs + xr,
+            //             yrs = ys + yr;
+
+            //         let lerps = ys + ()
+            //     }
+            // }
+        </script>
+    </body>
+</html>

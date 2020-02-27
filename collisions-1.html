@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tachyons/4.11.1/tachyons.min.css" integrity="sha256-XiJ+PedljEmPP2VaQzSzekfCZdPr0fpqmh9dY6kpsuQ=" crossorigin="anonymous" />
+
+        <title>Collisions</title>
+    </head>
+    <body>
+        <!-- <script type="module" src="Rectangle.mjs"></script> -->
+
+        <div class="flex items-center justify-center ma4">
+            <canvas id="main" class="ba br2" width="2000" height="1500"></canvas>
+        </div>
+        <button id="play-pause">Pause/Resume</button>
+
+        <pre id="code" class="ma4"></pre>
+
+        <script type="module">
+            import Rectangle from "./Rectangle.mjs";
+
+            const Physics = {
+                Run: true,
+                Loop: {
+                    FPS: 60,
+                    Interval: 0,
+                    LastTick: 0
+                },
+                Shapes: {
+                    Rectangles: []
+                }
+            };
+
+            const Canvas = document.getElementById("main");
+            const ctx = Canvas.getContext("2d");
+
+            function log(input) {
+                let code = document.getElementById("code");
+
+                // let pre = document.createElement("pre");
+                // pre.innerHTML = JSON.stringify(input, null, 2);
+                // code.appendChild(pre);
+
+                code.innerHTML = JSON.stringify(input, null, 2);
+            }
+
+            function Draw() {
+                ctx.clearRect(0, 0, Canvas.width, Canvas.height);
+
+                let fontSize = 12;
+                Physics.Shapes.Rectangles.forEach(r => {
+                    // if(r.NoOfCollisions > r.OldCollisions) {
+                    //     ctx.fillStyle = "#22CC88";
+                    // } else {
+                    //     ctx.fillStyle = "#FF5555";
+                    // }
+                    ctx.fillStyle = `rgba(${
+                        125
+                    }, ${
+                        ~~(r.NoOfCollisions / 10) > 180 ? 180 : ~~(r.NoOfCollisions / 10)
+                    }, ${
+                        ~~(r.NoOfCollisions / 100) > 80 ? 80 : ~~(r.NoOfCollisions / 100)
+                    }, 1)`;
+
+                    ctx.fillRect(
+                        r.X, r.Y,
+                        r.Width, r.Height
+                    );
+                    
+                    let origin = r.GetOrigin();
+                    ctx.fillStyle = "#FFF";
+                    ctx.font = `${ fontSize }pt monospace`;
+                    ctx.textAlign = "center";
+                    // ctx.fillText(`P:${ r.X.toFixed(1) },${ r.Y.toFixed(1) }`, origin.x, origin.y - (2 * fontSize * (4 / 3)));
+                    // ctx.fillText(`V:${ r.Vx.toFixed(1) },${ r.Vy.toFixed(1) }`, origin.x, origin.y - (fontSize * (4 / 3)));
+                    ctx.fillText(r.NoOfCollisions, origin.x, origin.y);
+                    // ctx.fillText(`O:${ origin.x.toFixed(1) },${ origin.y.toFixed(1) }`, origin.x, origin.y + (fontSize * (4 / 3)));
+                    // ctx.fillText(`R:${ origin.rw.toFixed(1) },${ origin.rh.toFixed(1) }`, origin.x, origin.y + (2 * fontSize * (4 / 3)));
+                });
+            }
+
+            function onTick() {
+                if(Physics.Run === true) {
+                    let now = Date.now(),
+                        d = now - Physics.Loop.LastTick;
+
+                    let [ W, H ] = [ Canvas.width, Canvas.height ];                
+
+                    // let acceleration = 0.0001;
+                    Physics.Shapes.Rectangles.forEach(rect => {
+                        // rect.Vx += Math.sign(rect.Vx) !== 0 ? (Math.sign(rect.Vx) * acceleration) : acceleration;
+                        // rect.Vy += Math.sign(rect.Vy) !== 0 ? (Math.sign(rect.Vy) * acceleration) : acceleration;
+                        
+                        // rect.Vx = Math.abs(rect.Vx) > 1 ? Math.sign(rect.Vx) * 1 : rect.Vx;
+                        // rect.Vy = Math.abs(rect.Vy) > 1 ? Math.sign(rect.Vy) * 1 : rect.Vy;
+
+                        rect.X += (rect.Vx * (1000 / d));
+                        rect.Y += (rect.Vy * (1000 / d));
+
+                        let { x1: bx, y1: by } = rect.GetBoundingBox();
+                        
+                        if(rect.X < 0) {
+                            rect.X = ~~(Math.random() * Canvas.width);
+                            rect.Vx = -rect.Vx;
+                        }
+                        if(bx > W) {
+                            rect.X = ~~(Math.random() * Canvas.width);
+                            rect.Vx = -rect.Vx;
+                        }
+                        
+                        if(rect.Y < 0) {
+                            rect.Y = ~~(Math.random() * Canvas.height);
+                            rect.Vy = -rect.Vy;
+                        }
+                        if(by > H) {
+                            rect.Y = ~~(Math.random() * Canvas.height);
+                            rect.Vy = -rect.Vy;
+                        }
+
+                        Physics.Shapes.Rectangles.forEach(r => {
+                            if(rect !== r && !rect.HasCollided(r)) {
+                                if(rect.IsCollision(r) === true) {
+                                    let tempx = r.Vx;
+                                    r.Vx = rect.Vx + (Math.random() * 0.0005);
+                                    rect.Vx = tempx + (Math.random() * 0.0005);
+
+                                    let tempy = r.Vy;
+                                    r.Vy = rect.Vy + (Math.random() * 0.0005);
+                                    rect.Vy = tempy + (Math.random() * 0.0005);
+                                    
+                                    rect.X += (rect.Vx * (1000 / d));
+                                    rect.Y += (rect.Vy * (1000 / d));
+                                }
+                            }
+                        });
+
+                        Physics.Shapes.Rectangles.forEach(r => {
+                            r.OnTick();
+                        });
+                    });
+
+                    Draw();
+
+                    // log(Physics.Shapes.Rectangles);
+
+                    Physics.Loop.LastTick = now;
+                }
+            };
+
+            for(let i = 0; i < 20; i++) {
+                let size = 50;
+                // let size = ~~(Math.random() * 50);
+
+                Physics.Shapes.Rectangles.push(
+                    new Rectangle(
+                        ~~(Math.random() * Canvas.width - size) + ((size / 2) + 1),
+                        ~~(Math.random() * Canvas.height - size) + ((size / 2) + 1),
+
+                        size,
+                        size,
+                        
+                        0.05,
+                        -0.05
+                    )
+                );
+            }
+
+            Physics.Loop.Interval = setInterval(
+                onTick,
+                1000 / Physics.Loop.FPS
+            );
+
+            document.getElementById("play-pause").onclick = () => Physics.Run = !Physics.Run;
+        </script>
+    </body>
+</html>
