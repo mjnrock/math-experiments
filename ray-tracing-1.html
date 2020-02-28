@@ -35,7 +35,8 @@
                     Time: 0,
                     MaxTime: 1440 * 2
                 },
-                SubjectCanMove: false
+                SubjectCanMove: false,
+                DisplayOutOfSight: true
             },
             Loop: {
                 Ticks: 0,
@@ -47,6 +48,7 @@
             SubjectVision: null,
             VisionRange: 350,
             Shapes: [],
+            ActiveShape: null
         };
 
         const Canvas = document.getElementById("main");
@@ -180,8 +182,8 @@
                 ~~(Math.random() * Canvas.width - 100),
                 ~~(Math.random() * Canvas.height - 75),
 
-                ~~(Math.random() * 50 + 50),
-                ~~(Math.random() * 50 + 25),
+                ~~(Math.random() * 150 + 50),
+                ~~(Math.random() * 150 + 25),
             ));
         }
 
@@ -215,7 +217,7 @@
 
             return endpoints;
         }
-        function GetAllWalls() {
+        function GetAllWalls(endpoints) {
             let nudge = -0.1;   // The points were lining up perfectly, which meant false-negatives on the intersection (this forces the "boundary" to either be slightly smaller (<0) or bigger (>0) to account for this)
             let mapnudge = 0.1;   // This special case needs to be bigger than the map
             let walls = [
@@ -234,6 +236,23 @@
                 }
             });
 
+            // walls.forEach(w => {
+            //     walls.forEach(w2 => {
+            //         let intersection = math.intersect(
+            //             [ w[ 0 ], w[ 1 ] ],
+            //             [ w[ 2 ], w[ 3 ] ],
+            //             [ w2[ 0 ], w2[ 1 ] ],
+            //             [ w2[ 2 ], w2[ 3 ] ]
+            //         );
+            //         if(intersection !== null && (
+            //             (w[ 0 ] !== w2[ 0 ] && w[ 1 ] !== w2[ 1 ])
+            //             && (w[ 2 ] !== w2[ 2 ] && w[ 3 ] !== w2[ 3 ])
+            //         )) {
+            //             endpoints.push(intersection);
+            //         }
+            //     })
+            // })
+
             return walls;
         }
 
@@ -247,13 +266,15 @@
 
         function RayTrace() {
             // Get all endpoints and sort by theta ASC
-            let endpoints = GetAllEndpoints().sort((a, b) => {
+            let endpoints = GetAllEndpoints();
+            let walls = GetAllWalls(endpoints);
+
+            endpoints.sort((a, b) => {
                 let atan = Math.atan2(a[1] - Physics.Subject.Y, -1 * (a[0] - Physics.Subject.X)) + Math.PI;
                 let btan = Math.atan2(b[1] - Physics.Subject.Y, -1 * (b[0] - Physics.Subject.X)) + Math.PI;
 
                 return atan - btan;
             });
-            let walls = GetAllWalls();
             let visibleEndpoints = new Set();
 
             endpoints.forEach(([x, y], i) => {
@@ -282,7 +303,7 @@
                     ctx.moveTo(Physics.Subject.X, Physics.Subject.Y);
                     ctx.lineTo(x, y);
                     ctx.stroke();
-                } else {
+                } else if(Physics.Config.DisplayOutOfSight) {
                     // Show the lines that aren't within the vision radius
                     ctx.strokeStyle = "#c93e3e";
                     ctx.beginPath();
@@ -341,12 +362,50 @@
 
                 Physics.Subject.X = x;
                 Physics.Subject.Y = y;
+            }            
+
+            if(Physics.ActiveShape) {
+                let { x, y } = GetCanvasPosition(e);
+
+                if(Physics.ActiveShape instanceof Rectangle) {
+                    Physics.ActiveShape.X = x - (Physics.ActiveShape.Width / 2);
+                    Physics.ActiveShape.Y = y - (Physics.ActiveShape.Height / 2);
+                } else if(Physics.ActiveShape instanceof Circle) {
+                    Physics.ActiveShape.X = x;
+                    Physics.ActiveShape.Y = y;
+                }
             }
         }
         document.addEventListener("keypress", e => {
-            if (e.which === 32) {
+            e.preventDefault();
+            
+            if (e.which === 122) {  // z
+                Physics.Config.DisplayOutOfSight = !Physics.Config.DisplayOutOfSight;
+            } else if (e.which === 32) {
                 Physics.Config.SubjectCanMove = !Physics.Config.SubjectCanMove;
             }
+        });
+        document.addEventListener("mouseup", e => {
+            Physics.ActiveShape = null;
+        });
+        document.addEventListener("mousedown", e => {
+            let { x, y } = GetCanvasPosition(e);
+
+            Physics.Shapes.forEach(s => {
+                if(s instanceof Rectangle) {
+                    if(s.IsWithinRectangle(x, y)) {
+                        Physics.ActiveShape = s;
+
+                        return
+                    }
+                } else if(s instanceof Circle) {
+                    if(s.IsWithinCircle(x, y)) {
+                        Physics.ActiveShape = s;
+
+                        return
+                    }
+                }
+            });
         });
         document.addEventListener("DOMMouseScroll", e => {
             if (e.shiftKey) {

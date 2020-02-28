@@ -12,6 +12,14 @@ export default class Rectangle {
         this.Collisions = [];
     }
 
+    static FromPoints(x0, y0, x1, y1) {
+        return new Rectangle(
+            x0, y0,
+            x1 - x0,
+            y1 - y0
+        );
+    }
+
     GetEndpoints() {
         return [
             [ this.X, this.Y ],
@@ -24,8 +32,8 @@ export default class Rectangle {
         return [
             [ this.X - nudge, this.Y - nudge, this.X + this.Width + nudge, this.Y - nudge ],
             [ this.X + this.Width + nudge, this.Y - nudge, this.X + this.Width + nudge, this.Y + this.Height + nudge ],
-            [ this.X + this.Width + nudge, this.Y + this.Height + nudge, this.X - nudge, this.Y + this.Height + nudge ],
-            [ this.X - nudge, this.Y + this.Height + nudge, this.X - nudge, this.Y - nudge],
+            [ this.X - nudge, this.Y - nudge, this.X - nudge, this.Y + this.Height + nudge],
+            [ this.X - nudge, this.Y + this.Height + nudge, this.X + this.Width + nudge, this.Y + this.Height + nudge ],
         ];
     };
 
@@ -46,6 +54,10 @@ export default class Rectangle {
         };
     }
 
+    IsWithinRectangle(x, y) {
+        return x >= this.X && x <= this.X + this.Width
+            && y >= this.Y && y <= this.Y + this.Height;
+    }
     IsCollision(rect) {
         let Origin0 = this.GetOrigin();
         let Origin1 = rect.GetOrigin();
