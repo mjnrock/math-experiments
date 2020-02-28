@@ -20,12 +20,12 @@ export default class Rectangle {
             [ this.X + this.Width, this.Y + this.Height ],
         ]
     };
-    GetSides() {
+    GetSides(nudge = 0) {
         return [
-            [ this.X, this.Y, this.X + this.Width, this.Y ],
-            [ this.X + this.Width, this.Y, this.X + this.Width, this.Y + this.Height ],
-            [ this.X + this.Width, this.Y + this.Height, this.X, this.Y + this.Height ],
-            [ this.X, this.Y + this.Height, this.X, this.Y ],
+            [ this.X - nudge, this.Y - nudge, this.X + this.Width + nudge, this.Y - nudge ],
+            [ this.X + this.Width + nudge, this.Y - nudge, this.X + this.Width + nudge, this.Y + this.Height + nudge ],
+            [ this.X + this.Width + nudge, this.Y + this.Height + nudge, this.X - nudge, this.Y + this.Height + nudge ],
+            [ this.X - nudge, this.Y + this.Height + nudge, this.X - nudge, this.Y - nudge],
         ];
     };
 

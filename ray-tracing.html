@@ -1,318 +1,367 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tachyons/4.11.1/tachyons.min.css" integrity="sha256-XiJ+PedljEmPP2VaQzSzekfCZdPr0fpqmh9dY6kpsuQ=" crossorigin="anonymous" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <title>Ray Tracing (Endpoint Analysis)</title>
-    </head>
-    <body>
-        <div>
-            <canvas id="main" class="ba br2"></canvas>
-        </div>
-        <button id="play-pause">Pause/Resume</button>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tachyons/4.11.1/tachyons.min.css"
+        integrity="sha256-XiJ+PedljEmPP2VaQzSzekfCZdPr0fpqmh9dY6kpsuQ=" crossorigin="anonymous" />
 
-        <pre id="code" class="ma4"></pre>
+    <title>Ray Tracing (Endpoint Analysis)</title>
+</head>
 
-        <script type="module">
-            import Circle from "./Circle.mjs";
-            import Rectangle from "./Rectangle.mjs";
+<body>
+    <div>
+        <canvas id="main" class="ba br2"></canvas>
+    </div>
+    <button id="play-pause">Pause/Resume</button>
 
-            const Physics = {
-                Run: true,
-                Config: {
-                    Circle: {
-                        Size: 5,
-                        GrowthFactor: 5,
-                        MaxSize: 250
-                    },
-                    Circadian: {
-                        Time: 0,
-                        MaxTime: 1440 * 2
-                    },
-                    SubjectCanMove: false
+    <pre id="code" class="ma4"></pre>
+
+    <script type="module">
+        import Circle from "./Circle.mjs";
+        import Rectangle from "./Rectangle.mjs";
+
+        const Physics = {
+            Run: true,
+            Config: {
+                Circle: {
+                    Size: 5,
+                    GrowthFactor: 5,
+                    MaxSize: 250
                 },
-                Loop: {
-                    Ticks: 0,
-                    FPS: 24,
-                    Interval: 0,
-                    LastTick: 0
+                Circadian: {
+                    Time: 0,
+                    MaxTime: 1440 * 2
                 },
-                Subject: null,
-                SubjectVision: null,
-                VisionRange: 350,
-                Shapes: [],
-            };
+                SubjectCanMove: false
+            },
+            Loop: {
+                Ticks: 0,
+                FPS: 24,
+                Interval: 0,
+                LastTick: 0
+            },
+            Subject: null,
+            SubjectVision: null,
+            VisionRange: 350,
+            Shapes: [],
+        };
 
-            const Canvas = document.getElementById("main");
-            const ctx = Canvas.getContext("2d");
+        const Canvas = document.getElementById("main");
+        const ctx = Canvas.getContext("2d");
 
-            window.onresize = e => {
-                ResizeCanvas();
-            };
-
-            function ResizeCanvas() {
-                ctx.canvas.width  = 1000;
-                ctx.canvas.height = 900;
-                // ctx.canvas.width  = window.innerWidth - 25;
-                // ctx.canvas.height = window.innerHeight - 25;
-            }
+        window.onresize = e => {
             ResizeCanvas();
+        };
 
-            function GetCanvasPosition(e) {
-                const rect = Canvas.getBoundingClientRect();
+        function ResizeCanvas() {
+            ctx.canvas.width = 1000;
+            ctx.canvas.height = 900;
+            // ctx.canvas.width  = window.innerWidth - 25;
+            // ctx.canvas.height = window.innerHeight - 25;
+        }
+        ResizeCanvas();
 
-                return {
-                    x: e.clientX - rect.left,
-                    y: e.clientY - rect.top
-                };
+        function GetCanvasPosition(e) {
+            const rect = Canvas.getBoundingClientRect();
+
+            return {
+                x: e.clientX - rect.left,
+                y: e.clientY - rect.top
+            };
+        }
+
+        function Draw() {
+            ctx.clearRect(0, 0, Canvas.width, Canvas.height);
+
+            // Draw the entire world dark
+            let rat = Physics.Config.Circadian.Time / Physics.Config.Circadian.MaxTime * 2 * Math.PI;
+            // let alpha = (1 / 10 * Math.cos(rat)) + (9 / 10);
+            let alpha = (1 / 2 * Math.cos(rat)) + (1 / 2);
+            ctx.globalAlpha = alpha.toFixed(2);
+            ctx.fillStyle = "#000";
+            ctx.fillRect(
+                0, 0, Canvas.width, Canvas.height
+            );
+            // Reset the "darkness" back to light
+            ctx.globalAlpha = 1.0;
+
+            // Draw the SubjectVision bubble first so that everything within it is visible
+            DrawCircle(Physics.SubjectVision);
+            // Draw subject
+            DrawCircle(Physics.Subject);
+            // Iterate the shapes on the map
+            Physics.Shapes.forEach(s => {
+                DrawShape(s);
+            });
+        }
+
+        function DrawShape(shape) {
+            if (shape instanceof Circle) {
+                DrawCircle(shape);
+            } else if (shape instanceof Rectangle) {
+                DrawRectangle(shape);
             }
+        }
 
-            function Draw() {
-                ctx.clearRect(0, 0, Canvas.width, Canvas.height);
+        function DrawCircle(circle) {
+            ctx.strokeStyle = circle.Color;
+            ctx.beginPath();
+            ctx.arc(circle.X, circle.Y, circle.Radius, 0, 2 * Math.PI);
 
-                // Draw the entire world dark
+            if (circle === Physics.SubjectVision) {
+                // Make the background of the SubjectVision bubble white so that everything else shows up
+                ctx.fillStyle = "#FFF";
+                ctx.fill();
+                ctx.stroke();
+            } else {
+                ctx.stroke();
+            }
+        }
+        function DrawRectangle(rect) {
+            ctx.strokeStyle = "#000";
+            ctx.strokeRect(
+                rect.X, rect.Y,
+                rect.Width, rect.Height
+            );
+        }
+
+        function onTick() {
+            if (Physics.Run === true) {
+                let now = Date.now(),
+                    d = now - Physics.Loop.LastTick;
+
+                let [W, H] = [Canvas.width, Canvas.height];
+
+                Draw();
+
+                RayTrace();
+
+                // Make the SubjectVision bubble follow the Subject
+                Physics.SubjectVision.X = Physics.Subject.X;
+                Physics.SubjectVision.Y = Physics.Subject.Y;
+
+
+                // Draw text of "Time / Max | Alpha"
                 let rat = Physics.Config.Circadian.Time / Physics.Config.Circadian.MaxTime * 2 * Math.PI;
-                // let alpha = (1 / 10 * Math.cos(rat)) + (9 / 10);
                 let alpha = (1 / 2 * Math.cos(rat)) + (1 / 2);
-                ctx.globalAlpha = alpha.toFixed(2);
+                let text = `${Physics.Config.Circadian.Time % Physics.Config.Circadian.MaxTime} / ${Physics.Config.Circadian.MaxTime} | ${alpha.toFixed(2)}`;
+                let tlen = ctx.measureText(text).width;
+                ctx.fillStyle = "#FFF";
+                ctx.clearRect((Canvas.width / 2) - (tlen / 2) - 5, 0, tlen + 10, 20 + 8);
                 ctx.fillStyle = "#000";
-                ctx.fillRect(
-                    0, 0, Canvas.width, Canvas.height
-                );
-                    // Reset the "darkness" back to light
-                ctx.globalAlpha = 1.0;
+                ctx.font = `8pt monospace`;
+                ctx.textAlign = "center";
+                ctx.fillText(text, (Canvas.width / 2), 10);
 
-                // Draw the SubjectVision bubble first so that everything within it is visible
-                DrawCircle(Physics.SubjectVision);
-                // Draw subject
-                DrawCircle(Physics.Subject);
-                // Iterate the shapes on the map
-                Physics.Shapes.forEach(s => {
-                    DrawShape(s);
-                });
+                let radians = (1 / (2 * Math.PI)) * (Physics.Loop.Ticks % 360);
+                ctx.fillText(`${radians.toFixed(2)} | ${Physics.Loop.Ticks % 360}`, (Canvas.width / 2), 20);
+
+                Physics.Config.Circadian.Time += 1;
+                Physics.Loop.LastTick = now;
+                Physics.Loop.Ticks += 1;
             }
+        };
 
-            function DrawShape(shape) {
-                if(shape instanceof Circle) {
-                    DrawCircle(shape);
-                } else if(shape instanceof Rectangle) {
-                    DrawRectangle(shape);
+        Physics.Subject = new Circle(
+            Canvas.width / 2,
+            Canvas.height / 2,
+            25
+        );
+        Physics.SubjectVision = new Circle(
+            Canvas.width / 2,
+            Canvas.height / 2,
+            Physics.VisionRange
+        );
+        for (let i = 0; i < 5; i++) {
+            Physics.Shapes.push(new Rectangle(
+                ~~(Math.random() * Canvas.width - 100),
+                ~~(Math.random() * Canvas.height - 75),
+
+                ~~(Math.random() * 50 + 50),
+                ~~(Math.random() * 50 + 25),
+            ));
+        }
+
+        Physics.Loop.Interval = setInterval(
+            onTick,
+            1000 / Physics.Loop.FPS
+        );
+
+        document.getElementById("play-pause").onclick = () => Physics.Run = !Physics.Run;
+
+        console.log(Physics);
+
+
+        function GetAllEndpoints() {
+            let endpoints = [
+                [0, 0],
+                [Canvas.width, 0],
+                [0, Canvas.height],
+                [Canvas.width, Canvas.height],
+            ];
+
+            // Gets the points of all four corners of a rectangle
+            Physics.Shapes.forEach(s => {
+                if (s instanceof Rectangle) {
+                    endpoints = [
+                        ...endpoints,
+                        ...s.GetEndpoints()
+                    ];
                 }
-            }
+            });
 
-            function DrawCircle(circle) {
-                ctx.strokeStyle = circle.Color;
-                ctx.beginPath();
-                ctx.arc(circle.X, circle.Y, circle.Radius, 0, 2 * Math.PI);
+            return endpoints;
+        }
+        function GetAllWalls() {
+            let nudge = -0.1;   // The points were lining up perfectly, which meant false-negatives on the intersection (this forces the "boundary" to either be slightly smaller (<0) or bigger (>0) to account for this)
+            let mapnudge = 0.1;   // This special case needs to be bigger than the map
+            let walls = [
+                [ 0 - mapnudge, 0 - mapnudge, Canvas.width + mapnudge, 0 - mapnudge ],
+                [ Canvas.width + mapnudge, 0 - mapnudge, Canvas.width + mapnudge, Canvas.height + mapnudge ],
+                [ Canvas.width + mapnudge, Canvas.height + mapnudge, 0 - mapnudge, Canvas.height + mapnudge ],
+                [ 0 - mapnudge, Canvas.height + mapnudge, 0 - mapnudge, 0 - mapnudge ],
+            ];
 
-                if(circle === Physics.SubjectVision) {
-                    // Make the background of the SubjectVision bubble white so that everything else shows up
-                    ctx.fillStyle = "#FFF";
-                    ctx.fill();
+            Physics.Shapes.forEach(s => {
+                if (s instanceof Rectangle) {
+                    walls = [
+                        ...walls,
+                        ...s.GetSides(nudge)
+                    ];
+                }
+            });
+
+            return walls;
+        }
+
+
+        function CCW(p1, p2, p3) {
+            return (p3[ 1 ] - p1[ 1 ]) * (p2[ 0 ] - p1[ 0 ]) > (p2[ 1 ] - p1[ 1 ]) * (p3[ 0 ] - p1[ 0 ]);
+        }
+        function IsIntersection(p1, p2, p3, p4) {
+            return (CCW(p1, p3, p4) != CCW(p2, p3, p4)) && (CCW(p1, p2, p3) != CCW(p1, p2, p4));
+        }
+
+        function RayTrace() {
+            // Get all endpoints and sort by theta ASC
+            let endpoints = GetAllEndpoints().sort((a, b) => {
+                let atan = Math.atan2(a[1] - Physics.Subject.Y, -1 * (a[0] - Physics.Subject.X)) + Math.PI;
+                let btan = Math.atan2(b[1] - Physics.Subject.Y, -1 * (b[0] - Physics.Subject.X)) + Math.PI;
+
+                return atan - btan;
+            });
+            let walls = GetAllWalls();
+            let visibleEndpoints = new Set();
+
+            endpoints.forEach(([x, y], i) => {
+                // Draw the ray lines from the center of Subject to the endpoint
+                if (Physics.SubjectVision.IsWithinCircle(x, y)) {
+                    let hasCollision = false;
+                    walls.forEach(([ xw0, yw0, xw1, yw1 ]) => {
+                        if(IsIntersection(
+                            [ Physics.Subject.X, Physics.Subject.Y ],
+                            [ x, y ],
+                            [ xw0, yw0 ],
+                            [ xw1, yw1 ]
+                        )) {
+                            hasCollision = true;
+
+                            return;
+                        }
+                    });
+                    if(hasCollision) {
+                        ctx.strokeStyle = "#e5b63d";
+                    } else {
+                        ctx.strokeStyle = "#4edb95";
+                        visibleEndpoints.add([ x, y ]); // Should be sorted by theta intrinsically from @endpoints
+                    }
+                    ctx.beginPath();
+                    ctx.moveTo(Physics.Subject.X, Physics.Subject.Y);
+                    ctx.lineTo(x, y);
                     ctx.stroke();
                 } else {
+                    // Show the lines that aren't within the vision radius
+                    ctx.strokeStyle = "#c93e3e";
+                    ctx.beginPath();
+                    ctx.moveTo(Physics.Subject.X, Physics.Subject.Y);
+                    ctx.lineTo(x, y);
                     ctx.stroke();
                 }
-            }
-            function DrawRectangle(rect) {
-                ctx.strokeStyle = "#000";
-                ctx.strokeRect(
-                    rect.X, rect.Y,
-                    rect.Width, rect.Height
+
+                let atan = Math.atan2(y - Physics.Subject.Y, -1 * (x - Physics.Subject.X)) * 180 / Math.PI + 180;
+
+                ctx.fillStyle = "#555";
+                ctx.fillText(`${i}:[${atan.toFixed(1)}]`,
+                    x, y + 10
                 );
-            }
+            });
 
-            function onTick() {
-                if(Physics.Run === true) {
-                    let now = Date.now(),
-                        d = now - Physics.Loop.LastTick;
+            // ProjectRays();
+            // let step = 1 / (2 * Math.PI);
+            // let scale = 1;  //Physics.Loop.FPS;
+            // let theta = (scale * Physics.Loop.Ticks) * step;
+            // ProjectRay(theta);
+            // ProjectRays();
 
-                    let [ W, H ] = [ Canvas.width, Canvas.height ];
+            // let closestWall = null;
+            // let walls = GetAllWalls();
+            // walls.forEach(([ x0, y0, x1, y1 ]) => {
 
-                    Draw();
+            // });
+        }
 
-                    RayTrace();
+        function ProjectRay(theta) {
+            let xr = Physics.SubjectVision.X + (Physics.SubjectVision.Radius * Math.cos(theta)),
+                yr = Physics.SubjectVision.Y + (Physics.SubjectVision.Radius * Math.sin(theta)),
+                slope = (Physics.SubjectVision.Y - yr) / (Physics.SubjectVision.X - xr);
 
-                    // Make the SubjectVision bubble follow the Subject
-                    Physics.SubjectVision.X = Physics.Subject.X;
-                    Physics.SubjectVision.Y = Physics.Subject.Y;                    
+            ctx.strokeStyle = "#2b82d8";
+            ctx.beginPath();
+            ctx.moveTo(Physics.SubjectVision.X, Physics.SubjectVision.Y);
+            ctx.lineTo(xr, yr);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(xr, yr, 10, 0, 2 * Math.PI);
+            ctx.stroke();
+        }
 
-                
-                    // Draw text of "Time / Max | Alpha"
-                    let rat = Physics.Config.Circadian.Time / Physics.Config.Circadian.MaxTime * 2 * Math.PI;
-                    let alpha = (1 / 2 * Math.cos(rat)) + (1 / 2);
-                    let text = `${ Physics.Config.Circadian.Time % Physics.Config.Circadian.MaxTime } / ${ Physics.Config.Circadian.MaxTime } | ${ alpha.toFixed(2) }`;
-                    let tlen = ctx.measureText(text).width;
-                    ctx.fillStyle = "#FFF";
-                    ctx.clearRect((Canvas.width / 2) - (tlen / 2) - 5, 0, tlen + 10, 20 + 8);
-                    ctx.fillStyle = "#000";
-                    ctx.font = `8pt monospace`;
-                    ctx.textAlign = "center";
-                    ctx.fillText(text, (Canvas.width / 2), 10);
-
-                    let radians = (1 / (2 * Math.PI)) * (Physics.Loop.Ticks % 360);
-                    ctx.fillText(`${ radians.toFixed(2) } | ${ Physics.Loop.Ticks % 360 }`, (Canvas.width / 2), 20);
-
-                    Physics.Config.Circadian.Time += 1;
-                    Physics.Loop.LastTick = now;
-                    Physics.Loop.Ticks += 1;
-                }
-            };
-
-            Physics.Subject = new Circle(
-                Canvas.width / 2,
-                Canvas.height / 2,
-                25
-            );
-            Physics.SubjectVision = new Circle(
-                Canvas.width / 2,
-                Canvas.height / 2,
-                Physics.VisionRange
-            );
-            for(let i = 0; i < 5; i++) {
-                Physics.Shapes.push(new Rectangle(
-                    ~~(Math.random() * Canvas.width - 100),
-                    ~~(Math.random() * Canvas.height - 75),
-
-                    ~~(Math.random() * 50 + 50),
-                    ~~(Math.random() * 50 + 25),
-                ));
-            }
-
-            Physics.Loop.Interval = setInterval(
-                onTick,
-                1000 / Physics.Loop.FPS
-            );
-
-            document.getElementById("play-pause").onclick = () => Physics.Run = !Physics.Run;
-
-            console.log(Physics);
-
-
-            function GetAllEndpoints() {
-                let endpoints = [
-                    [ 0, 0 ],
-                    [ Canvas.width, 0 ],
-                    [ 0, Canvas.height ],
-                    [ Canvas.width, Canvas.height ],
-                ];
-
-                // Gets the points of all four corners of a rectangle
-                Physics.Shapes.forEach(s => {
-                    if(s instanceof Rectangle) {
-                        endpoints = [
-                            ...endpoints,
-                            ...s.GetEndpoints()
-                        ];
-                    }
-                });
-
-                return endpoints;
-            }
-            function GetAllWalls() {
-                let walls = [
-                    [ 0, 0, Canvas.width, 0 ],
-                    [ Canvas.width, 0, Canvas.width, Canvas.height ],
-                    [ Canvas.width, Canvas.height, 0, Canvas.height ],
-                    [ 0, Canvas.height, 0, 0 ],
-                ];
-
-                Physics.Shapes.forEach(s => {
-                    if(s instanceof Rectangle) {
-                        walls = [
-                            ...walls,
-                            ...s.GetWalls()
-                        ];
-                    }
-                });
-            }
-
-            function RayTrace() {
-                let endpoints = GetAllEndpoints();
-
-                endpoints.forEach(([ x, y ]) => {
-                    // Draw the ray lines from the center of Subject to the endpoint
-                    if(Physics.SubjectVision.IsWithinCircle(x, y)) {
-                        ctx.strokeStyle = "#e5b63d";
-                        ctx.beginPath();
-                        ctx.moveTo(Physics.Subject.X, Physics.Subject.Y);
-                        ctx.lineTo(x, y);
-                        ctx.stroke(); 
-                    } else {
-                        // Show the lines that aren't within the vision radius
-                        // ctx.strokeStyle = "#c93e3e";
-                        // ctx.beginPath();
-                        // ctx.moveTo(Physics.Subject.X, Physics.Subject.Y);
-                        // ctx.lineTo(x, y);
-                        // ctx.stroke(); 
-                    }
-                });
-
-                // ProjectRays();
-                let step = 1 / (2 * Math.PI);
-                let scale = 1;  //Physics.Loop.FPS;
-                let theta = (scale * Physics.Loop.Ticks) * step;
+        function ProjectRays() {
+            for (let theta = -Math.PI; theta <= Math.PI; theta += 0.01) {
                 ProjectRay(theta);
-
-                // let closestWall = null;
-                // let walls = GetAllWalls();
-                // walls.forEach(([ x0, y0, x1, y1 ]) => {
-                    
-                // });
             }
+        }
 
-            function ProjectRay(theta) {
-                let xr = Physics.SubjectVision.X + (Physics.SubjectVision.Radius * Math.cos(theta)),
-                    yr = Physics.SubjectVision.Y + (Physics.SubjectVision.Radius * Math.sin(theta)),
-                    slope = (Physics.SubjectVision.Y - yr) / (Physics.SubjectVision.X - xr);
-                
-                ctx.strokeStyle = "#2b82d8";
-                ctx.beginPath();
-                ctx.moveTo(Physics.SubjectVision.X, Physics.SubjectVision.Y);
-                ctx.lineTo(xr, yr);
-                ctx.stroke();
-                ctx.beginPath();
-                ctx.arc(xr, yr, 10, 0, 2 * Math.PI);
-                ctx.stroke();
+        Canvas.onmousemove = e => {
+            if (Physics.Config.SubjectCanMove) {
+                // Set the position of the subject
+                let { x, y } = GetCanvasPosition(e);
+
+                Physics.Subject.X = x;
+                Physics.Subject.Y = y;
             }
-
-            function ProjectRays() {
-                for(let theta = -Math.PI; theta <= Math.PI; theta += 0.01) {
-                    ProjectRay(theta);
+        }
+        document.addEventListener("keypress", e => {
+            if (e.which === 32) {
+                Physics.Config.SubjectCanMove = !Physics.Config.SubjectCanMove;
+            }
+        });
+        document.addEventListener("DOMMouseScroll", e => {
+            if (e.shiftKey) {
+                let step = -10;
+                if (e.detail > 0) {
+                    // DOWN
+                    Physics.SubjectVision.Radius -= step;
+                    Physics.SubjectVision.VisionRange -= step;
+                } else {
+                    // UP
+                    Physics.SubjectVision.Radius += step;
+                    Physics.SubjectVision.VisionRange += step;
                 }
             }
-
-            Canvas.onmousemove = e => {
-                if(Physics.Config.SubjectCanMove) {
-                    // Set the position of the subject
-                    let { x, y } = GetCanvasPosition(e);
-
-                    Physics.Subject.X = x;
-                    Physics.Subject.Y = y;
-                }
-            }
-            document.addEventListener("keypress", e => {
-                if(e.which === 32) {
-                    Physics.Config.SubjectCanMove = !Physics.Config.SubjectCanMove;
-                }
-            });
-            document.addEventListener("DOMMouseScroll", e => {
-                if(e.shiftKey) {
-                    let step = -10;
-                    if(e.detail > 0) {
-                        // DOWN
-                        Physics.SubjectVision.Radius -= step;
-                        Physics.SubjectVision.VisionRange -= step;
-                    } else {
-                        // UP
-                        Physics.SubjectVision.Radius += step;
-                        Physics.SubjectVision.VisionRange += step;
-                    }
-                }
-            });
+        });
 
 
 
@@ -330,7 +379,7 @@
 
             //         // Invert Y-axis to compensate for Unit Circle Y direction and Canvas Y direction
             //         yr = -yr;
-                    
+
             //         // Add the Subject's offset to get xr|yr relative to Grid
             //         let xrs = xs + xr,
             //             yrs = ys + yr;
@@ -338,6 +387,7 @@
             //         let lerps = ys + ()
             //     }
             // }
-        </script>
-    </body>
+    </script>
+</body>
+
 </html>
