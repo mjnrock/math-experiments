@@ -313,26 +313,26 @@
             // });
         }
 
-        function ProjectRay(theta) {
-            let xr = Physics.SubjectVision.X + (Physics.SubjectVision.Radius * Math.cos(theta)),
-                yr = Physics.SubjectVision.Y + (Physics.SubjectVision.Radius * Math.sin(theta)),
-                slope = (Physics.SubjectVision.Y - yr) / (Physics.SubjectVision.X - xr);
+        // function ProjectRay(theta) {
+        //     let xr = Physics.SubjectVision.X + (Physics.SubjectVision.Radius * Math.cos(theta)),
+        //         yr = Physics.SubjectVision.Y + (Physics.SubjectVision.Radius * Math.sin(theta)),
+        //         slope = (Physics.SubjectVision.Y - yr) / (Physics.SubjectVision.X - xr);
 
-            ctx.strokeStyle = "#2b82d8";
-            ctx.beginPath();
-            ctx.moveTo(Physics.SubjectVision.X, Physics.SubjectVision.Y);
-            ctx.lineTo(xr, yr);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.arc(xr, yr, 10, 0, 2 * Math.PI);
-            ctx.stroke();
-        }
+        //     ctx.strokeStyle = "#2b82d8";
+        //     ctx.beginPath();
+        //     ctx.moveTo(Physics.SubjectVision.X, Physics.SubjectVision.Y);
+        //     ctx.lineTo(xr, yr);
+        //     ctx.stroke();
+        //     ctx.beginPath();
+        //     ctx.arc(xr, yr, 10, 0, 2 * Math.PI);
+        //     ctx.stroke();
+        // }
 
-        function ProjectRays() {
-            for (let theta = -Math.PI; theta <= Math.PI; theta += 0.01) {
-                ProjectRay(theta);
-            }
-        }
+        // function ProjectRays() {
+        //     for (let theta = -Math.PI; theta <= Math.PI; theta += 0.01) {
+        //         ProjectRay(theta);
+        //     }
+        // }
 
         Canvas.onmousemove = e => {
             if (Physics.Config.SubjectCanMove) {
