@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tachyons/4.11.1/tachyons.min.css"
+        integrity="sha256-XiJ+PedljEmPP2VaQzSzekfCZdPr0fpqmh9dY6kpsuQ=" crossorigin="anonymous" /> -->
+
+    <title>Ray Tracing (Endpoint Analysis)</title>
+</head>
+
+<body>
+    <div>
+        <canvas id="main" class="ba br2"></canvas>
+    </div>
+    <button id="play-pause">Pause/Resume</button>
+
+    <pre id="code" class="ma4"></pre>
+
+    <script type="module">
+        import V2 from "./package.mjs";
+
+        const Data = {
+            endpoints: []
+        };
+        const Physics = {
+            Run: true,
+            Config: {},
+            Loop: {
+                Ticks: 0,
+                FPS: 24,
+                Interval: 0,
+                LastTick: 0
+            },
+            Shapes: [],
+        };
+
+        const Canvas = document.getElementById("main");
+        const ctx = Canvas.getContext("2d");
+
+        window.onresize = e => {
+            ResizeCanvas();
+        };
+
+        function ResizeCanvas() {
+            // ctx.canvas.width = 1000;
+            // ctx.canvas.height = 900;
+            ctx.canvas.width  = window.innerWidth - 25;
+            ctx.canvas.height = Math.max(900, window.innerHeight - 50);
+        }
+        ResizeCanvas();
+
+        function GetCanvasPosition(e) {
+            const rect = Canvas.getBoundingClientRect();
+
+            return {
+                x: e.clientX - rect.left,
+                y: e.clientY - rect.top
+            };
+        }
+
+        function Init() {
+            ctx.strokeStyle = "#000";
+            ctx.fillStyle = "#000";
+
+            let render = V2.Model.Circle.Make(
+                Canvas.width / 2,
+                Canvas.height / 2,
+                25
+            ).set("name", "Subject");
+
+            Physics.Shapes.push(render);
+
+            for(let i = 0; i < 5; i++) {
+                Physics.Shapes.push(V2.Model.Rectangle.Make(
+                    ~~(Math.random() * Canvas.width) - 50,
+                    ~~(Math.random() * Canvas.height) - 50,
+
+                    ~~(Math.random() * 150) + 150,
+                    ~~(Math.random() * 100) + 50,
+                ));
+            }
+        }
+        Init();
+
+        function Tick(entity, time) {
+            entity.Tick(time);
+
+            if(entity instanceof V2.Model.Rectangle) {
+                Data.endpoints = [
+                    ...Data.endpoints,
+                    ...entity.GetSidePoints()
+                ];
+            }
+
+
+            if(entity.get("name") === "Subject") {
+                entity.set("solid", true);
+            }
+        }
+        function Render(entity, time) {
+            if(entity instanceof V2.Model.Circle) {
+                V2.Render.RenderCircle.Draw(entity, ctx, time);   
+            } else if(entity instanceof V2.Model.Rectangle) {
+                V2.Render.RenderRectangle.Draw(entity, ctx, time);   
+            }
+        }
+
+        function GetSubject() {
+            return Physics.Shapes.filter(s => s.get("name") === "Subject")[ 0 ];
+        }
+
+        function ProcessData() {
+            let subject = GetSubject();
+
+            Data.endpoints.sort((a, b) => {
+                let atan = Math.atan2(a[1] - subject.Y, -1 * (a[0] - subject.X)) + Math.PI;
+                let btan = Math.atan2(b[1] - subject.Y, -1 * (b[0] - subject.X)) + Math.PI;
+
+                return atan - btan;
+            });
+
+            Data.endpoints.forEach(([ x, y ], i) => {
+                let theta = Math.atan2(y - subject.Y, -1 * (x - subject.X)) + Math.PI;
+                ctx.fillText(`[${ i }, ${ (parseFloat)(theta * 180 / Math.PI).toFixed(1) }]`, x + 10, y - 10);
+            });
+        }
+
+        function ClearCanvas() {
+            ctx.fillStyle = "#fff";
+            ctx.fillRect(0, 0, Canvas.width, Canvas.height);
+        }
+        function ClearData() {
+            Data.endpoints = [];
+        }
+
+        function onTick() {
+            if(Physics.Run) {
+                let now = Date.now(),
+                    d = now - Physics.Loop.LastTick;
+
+                ClearCanvas();
+                Physics.Shapes.forEach(s => {
+                    Tick(s, d);
+                    Render(s, d);
+                });
+                ProcessData();
+                ClearData();
+
+                Physics.Ticks += 1;
+                Physics.LastTick = now;
+            }
+        }
+
+        Physics.Loop.Interval = setInterval(
+            onTick,
+            1000 / Physics.Loop.FPS
+        );
+
+        document.getElementById("play-pause").onclick = () => Physics.Run = !Physics.Run;
+    </script>
+</body>
+
+</html>
