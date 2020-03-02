@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tachyons/4.11.1/tachyons.min.css" integrity="sha256-XiJ+PedljEmPP2VaQzSzekfCZdPr0fpqmh9dY6kpsuQ=" crossorigin="anonymous" />
+
+        <title>Hex</title>
+    </head>
+    <body>
+        <div>
+            <canvas id="main" class="ba br2 ml4 mt4" width="1000" height="900"></canvas>
+        </div>
+        <button id="play-pause">Pause/Resume</button>
+    
+        <pre id="code" class="ma4"></pre>
+
+        <script type="module">
+            import Hex from "./package.mjs";
+            
+            const Canvas = document.getElementById("main");
+            const ctx = Canvas.getContext("2d");
+
+            function Draw(delta) {
+                ctx.fillStyle = "#fff";
+                ctx.fillRect(0, 0, Canvas.width, Canvas.height);
+
+                requestAnimationFrame(Draw);
+            }
+
+            requestAnimationFrame(Draw);
+
+            // Canvas.onclick = e => {
+            //     let x = e.x - e.target.offsetLeft,
+            //         y = e.y - e.target.offsetTop;
+            // };
+            
+            // Canvas.onmousemove = e => {
+            //     let x = e.x - e.target.offsetLeft,
+            //         y = e.y - e.target.offsetTop;
+
+            //     DATA.Mouse = [ x, y ];
+            // }
+        </script>
+    </body>
+</html>
