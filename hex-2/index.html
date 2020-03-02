@@ -83,9 +83,9 @@
                     //NOTE Text stuff
                     let [ px, py ] = Hex.HexTile.TileToPixel(tx, ty, scale, { offX: offset, offY: offset, orientation });
                     if(Math.sqrt(Math.pow(mx - px, 2) + Math.pow(my - py, 2)) <= scale * Math.sqrt(3) / 2) {
-                        potentialHexes = [[ tile, px, py ]];
+                        potentialHexes = [[ tile, [ px, py ]]];
                     } else if(Math.sqrt(Math.pow(mx - px, 2) + Math.pow(my - py, 2)) <= scale) {
-                        potentialHexes.push([ tile, px, py ]);
+                        potentialHexes.push([ tile, [ px, py ] ]);
                     }
                     
                     ctx.strokeStyle = "#00f";
@@ -115,6 +115,7 @@
 
                 if(potentialHexes.length) {
                     DATA.ActiveHex = potentialHexes[ 0 ][ 0 ];
+                    let [ px, py ] = potentialHexes[ 0 ][ 1 ];
                     let [ tx, ty ] = DATA.ActiveHex.ToOffset();
                     let corners = Hex.HexTile.GetPixelCorners(tx, ty, scale, { offX: offset, offY: offset, orientation });
                     ctx.fillStyle = "#0f0";
@@ -129,6 +130,13 @@
                     });
                     ctx.closePath();
                     ctx.fill();
+
+                    ctx.fillStyle = "#000";
+                    ctx.font = "12pt mono";
+                    ctx.fillText(`${ ~~(scale * 2) }, ${ ~~(scale * Math.sqrt(3)) }`, px, py - 20);
+                    ctx.fillText(`${ ~~px }, ${ ~~py }`, px, py);
+                    ctx.fillText(`${ ~~DATA.ActiveHex.X }, ${ ~~DATA.ActiveHex.Y }, ${ ~~DATA.ActiveHex.Z }`, px, py + 20);
+                    ctx.fillText(`${ ~~tx }, ${ ~~ty }`, px, py + 40);
                 }
                     
                 //NOTE Mouse Draw
