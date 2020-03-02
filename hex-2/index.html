@@ -19,6 +19,10 @@
         <script type="module">
             import Hex from "./package.mjs";
 
+            const DATA = {
+                Mouse: [ -100, -100 ],
+                ActiveHex: null
+            };
             const Canvas = document.getElementById("main");
             const ctx = Canvas.getContext("2d");
 
@@ -30,35 +34,141 @@
                 }
             }
 
-            Object.values(Grid).forEach((tile, index) => {
-                let [ tx, ty ] = tile.ToOffset();
-                let scale = 100;
-                let corners = Hex.HexTile.GetPixelCorners(tx, ty, scale, scale * 2, scale * 2);
-                console.log(corners);
+            // ODD COLUMN only
+            function IsInsideHexagaon(x, y, scale = 1.0, offX = 0, offY = 0) {
+                x -= offX;
+                y -= offY;
 
-                corners.forEach((c, i) => {
-                    let [ x0, y0 ] = corners[ i ];
-                    let [ x1, y1 ] = corners[ i + 1 > 5 ? 0 : i + 1];
+                let tx = ~~(x / scale * 2.0),
+                    ty = ~~(y / scale * Math.sqrt(3));
 
-                    ctx.strokeStyle = index & 1 ? "#000" : "#f00";
+                return [
+                    tx,
+                    ty
+                ]
+            }
+
+            let orientation = Hex.Enum.Orientation.ODD_COLUMN;
+            // let orientation = Hex.Enum.Orientation.EVEN_COLUMN;
+            // let orientation = Hex.Enum.Orientation.ODD_ROW;
+            // let orientation = Hex.Enum.Orientation.EVEN_ROW;
+            
+            let scale = 128;
+            let offset = 0;//scale * 2;
+
+            function Draw(delta) {
+                ctx.fillStyle = "#fff";
+                ctx.fillRect(0, 0, Canvas.width, Canvas.height);
+
+                let [ mx, my ] = DATA.Mouse;
+                let potentialHexes = [];
+
+                Object.values(Grid).forEach((tile, index) => {
+                    let [ tx, ty ] = tile.ToOffset();
+                    let corners = Hex.HexTile.GetPixelCorners(tx, ty, scale, { offX: offset, offY: offset, orientation });
+
+                    //NOTE Draw the hexagons
+                    corners.forEach((c, i) => {
+                        let [ x0, y0 ] = corners[ i ];
+                        let [ x1, y1 ] = corners[ i + 1 > 5 ? 0 : i + 1];
+
+                        ctx.strokeStyle = index & 1 ? "#000" : "#f00";
+                        ctx.beginPath();
+                        ctx.moveTo(x0, y0);
+                        ctx.lineTo(x1, y1);
+                        ctx.stroke();
+                    });
+
+
+                    //NOTE Text stuff
+                    let [ px, py ] = Hex.HexTile.TileToPixel(tx, ty, scale, { offX: offset, offY: offset, orientation });
+                    if(Math.sqrt(Math.pow(mx - px, 2) + Math.pow(my - py, 2)) <= scale) {
+                        potentialHexes.push([ tile, px, py ]);
+                    }
+                    
+                    ctx.strokeStyle = "#00f";
                     ctx.beginPath();
-                    ctx.moveTo(x0, y0);
-                    ctx.lineTo(x1, y1);
+                    ctx.arc(px, py, scale, 0, 2 * Math.PI);
                     ctx.stroke();
+                    
+
+                    ctx.strokeStyle = "#f00";
+                    ctx.beginPath();
+                    ctx.arc(px, py, scale * Math.sqrt(3) / 2, 0, 2 * Math.PI);
+                    ctx.stroke(); 
+
+
+                    ctx.fillStyle = "#000";
+                    ctx.font = "12pt mono";
+                    ctx.fillText(`${ ~~(scale * 2) }, ${ ~~(scale * Math.sqrt(3)) }`, px, py - 20);
+                    ctx.fillText(`${ ~~px }, ${ ~~py }`, px, py);
+                    ctx.fillText(`${ ~~tile.X }, ${ ~~tile.Y }, ${ ~~tile.Z }`, px, py + 20);
+                    ctx.fillText(`${ ~~tx }, ${ ~~ty }`, px, py + 40);
                 });
 
-                let [ px, py ] = Hex.HexTile.GetPixelOrigin(tx, ty, scale, scale * 2, scale * 2);
-                ctx.fillStyle = "#000";
-                ctx.font = "12pt mono";
-                ctx.fillText(`${ ~~px }, ${ ~~py }`, px, py);
-            });
+                potentialHexes.sort(([ ta, apx, apy ], [ tb, bpx, bpy ]) => {
+                    return Math.sqrt(Math.pow(mx - apx, 2) + Math.pow(my - apy, 2))
+                        - Math.sqrt(Math.pow(mx - bpx, 2) + Math.pow(my - bpy, 2));
+                });
+
+                if(potentialHexes.length) {
+                    DATA.ActiveHex = potentialHexes[ 0 ][ 0 ];
+                    let [ tx, ty ] = DATA.ActiveHex.ToOffset();
+                    let corners = Hex.HexTile.GetPixelCorners(tx, ty, scale, { offX: offset, offY: offset, orientation });
+                    ctx.fillStyle = "#0f0";
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(corners[ 0 ][ 0 ], corners[ 0 ][ 1 ]);
+                    corners.forEach((c, i) => {
+                        let [ x0, y0 ] = corners[ i ];
+                        let [ x1, y1 ] = corners[ i + 1 > 5 ? 0 : i + 1];
+
+                        ctx.lineTo(x1, y1);
+                    });
+                    ctx.closePath();
+                    ctx.fill();
+                }
+                    
+                //NOTE Mouse Draw
+                ctx.strokeStyle = "#00f";
+                ctx.beginPath();
+                ctx.arc(mx, my, 25, 0, 2 * Math.PI);
+                ctx.stroke(); 
+                
+                requestAnimationFrame(Draw);
+            }
+            
+            // for(let xw = 0; xw < Canvas.width; xw++) {
+            //     for(let yh = 0; yh < Canvas.height; yh++) {
+            //         let [ ptx, pty ] = IsInsideHexagaon(xw, yh);
+            //         let [ ppx, ppy ] = Hex.HexTile.TileToPixel(ptx, pty, scale);
+
+            //         if((ptx + pty) & 1) {
+            //             ctx.strokeStyle = "#00f";
+            //         } else {
+            //             ctx.strokeStyle = "#f00";
+            //         }
+            //         ctx.strokeRect(ppx - scale, ppy - scale * Math.sqrt(3) / 2, scale * 2, scale * Math.sqrt(3));
+            //     }
+            // }
+
+            requestAnimationFrame(Draw);
 
             Canvas.onclick = e => {
                 let x = e.x - e.target.offsetLeft,
                     y = e.y - e.target.offsetTop;
                     
-                console.log([ x, y ]);
+                let [ tx, ty ] = Hex.HexTile.PixelToTile(x, y, scale);
+
+                console.log(tx, ty);
             };
+            
+            Canvas.onmousemove = e => {
+                let x = e.x - e.target.offsetLeft,
+                    y = e.y - e.target.offsetTop;
+
+                DATA.Mouse = [ x, y ];
+            }
         </script>
     </body>
 </html>
