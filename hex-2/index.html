@@ -82,7 +82,9 @@
 
                     //NOTE Text stuff
                     let [ px, py ] = Hex.HexTile.TileToPixel(tx, ty, scale, { offX: offset, offY: offset, orientation });
-                    if(Math.sqrt(Math.pow(mx - px, 2) + Math.pow(my - py, 2)) <= scale) {
+                    if(Math.sqrt(Math.pow(mx - px, 2) + Math.pow(my - py, 2)) <= scale * Math.sqrt(3) / 2) {
+                        potentialHexes = [[ tile, px, py ]];
+                    } else if(Math.sqrt(Math.pow(mx - px, 2) + Math.pow(my - py, 2)) <= scale) {
                         potentialHexes.push([ tile, px, py ]);
                     }
                     
