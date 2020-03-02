@@ -1,26 +1,27 @@
 import Hexagon from "./Hexagon.mjs";
-import Point from "./Point.mjs";
-import Point3 from "./Point3.mjs";
 
 export default class HexTile {
-    constructor(x, y, z, size, { shape = null } = {}) {
-        this.Location = new Point3(x, y, z);
+    constructor(q, r, s, { shape = null } = {}) {
+        this.Q = q;
+        this.R = r;
+        this.S = s;
+
         this.Shape = shape;
     }
 
     ToAxial() {
-        return new Point(
-            this.Location.X,
-            this.Location.Z
-        );
+        return [
+            this.Q,
+            this.R
+        ];
     }
 
-    CalcOffset(x = 0, y = 0, z = 0) {
-        return new Point3(
-            this.Location.X + x,
-            this.Location.Y + y,
-            this.Location.Z + z
-        );
+    CalcOffset(q = 0, r = 0, s = 0) {
+        return [
+            this.Q + q,
+            this.R + r,
+            this.S + s
+        ];
     }
     /**
      * Returns neighbors starting from "East" and moving anticlockwise
@@ -51,64 +52,35 @@ export default class HexTile {
 
 
 
-    GetDistance(x, y, z) {
+    GetDistance(q, r, s) {
         return HexTile.CalcDistance(
-            this.Location,
-            new Point(x, y, z)
+            [ this.Q, this.R, this.S ],
+            [ q, r, s ]
         )
     }
     GetDistanceToTile(tile) {
         return HexTile.CalcDistance(
-            this.Location,
-            tile.Location
+            [ this.Q, this.R, this.S ],
+            [ tile.Q, tile.R, tile.S ]
         )
-    }
-
-    Copy(x = 0, y = 0, z = 0) {
-        return new HexTile(
-            this.Shape,
-            new Point3(
-                this.Location.X + x,
-                this.Location.Y + y,
-                this.Location.Z + z
-            )
-        );
-    }
-
-    static CalcAllWithinRange(point3, range = 0) {
-        let results = [];
-
-        for(let x = -range; x <= range; x++) {
-            for(let y = Math.max(-range, -x - range); y <= Math.min(range, -x + range); y++) {
-                let z = -x - y;
-
-                results.push(new Point3(
-                    point3.X + x,
-                    point3.Y + y,
-                    point3.Z + z
-                ));
-            }
-        }
-
-        return results;
     }
 
     static CalcDistance(a, b) {        
         return Math.max(
-            Math.abs(a.X - b.X),
-            Math.abs(a.Y - b.Y),
-            Math.abs(a.Z - b.Z)
+            Math.abs(a[ 0 ] - b[ 0 ]),
+            Math.abs(a[ 1 ] - b[ 1 ]),
+            Math.abs(a[ 2 ] - b[ 2 ])
         );
     }
 
     static CubeLerp(a, b, t) {
         let lerp = (c, d) => c + (d - c) * t;
 
-        return new Point3(
-            lerp(a.X, b.X, t),
-            lerp(a.Y, b.Y, t),
-            lerp(a.Z, b.Z, t)
-        );
+        return [
+            lerp(a[ 0 ], b[ 0 ], t),
+            lerp(a[ 1 ], b[ 1 ], t),
+            lerp(a[ 2 ], b[ 2 ], t)
+        ];
     }
     
     static DrawLine(a, b) {

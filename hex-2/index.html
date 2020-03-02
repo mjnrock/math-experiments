@@ -10,7 +10,7 @@
     </head>
     <body>
         <div>
-            <canvas id="main" class="ba br2" width="1000" height="900"></canvas>
+            <canvas id="main" class="ba br2 ml4 mt4" width="1000" height="900"></canvas>
         </div>
         <button id="play-pause">Pause/Resume</button>
     
@@ -22,26 +22,41 @@
             const Canvas = document.getElementById("main");
             const ctx = Canvas.getContext("2d");
 
-            let grid = new Hex.HexGrid(5, 5, 64);
-            console.log(grid);
+            let Grid = {};
+            let size = 5;
+            for(let row = 0; row < size; row++) {
+                for(let col = 0; col < size; col++) {
+                    Grid[ `${ row }${ col }` ] = new Hex.HexTile(row, col);
+                }
+            }
 
-            Object.values(grid.Tiles).forEach(tile => {
-                let corners = tile.Shape.GetCorners();
+            Object.values(Grid).forEach((tile, index) => {
+                let [ tx, ty ] = tile.ToOffset();
+                let corners = Hex.HexTile.GetPixelCorners(tx, ty, 64, 128, 128);
+                console.log(corners);
 
                 corners.forEach((c, i) => {
                     let [ x0, y0 ] = corners[ i ];
                     let [ x1, y1 ] = corners[ i + 1 > 5 ? 0 : i + 1];
 
-                    ctx.strokeStyle = "#000";
+                    ctx.strokeStyle = index & 1 ? "#000" : "#f00";
                     ctx.beginPath();
                     ctx.moveTo(x0, y0);
                     ctx.lineTo(x1, y1);
                     ctx.stroke();
-                })
+                });
 
                 ctx.fillStyle = "#000";
-                ctx.fillText(`${ ~~tile.Location.X }, ${ ~~tile.Location.Y }`, tile.Shape.Origin.X - 10, tile.Shape.Origin.Y);
+                ctx.font = "12pt mono";
+                ctx.fillText(tile.ToOffset(), tile.X, tile.Y);
             });
+
+            Canvas.onclick = e => {
+                let x = e.x - e.target.offsetLeft,
+                    y = e.y - e.target.offsetTop;
+                    
+                console.log([ x, y ]);
+            };
         </script>
     </body>
 </html>

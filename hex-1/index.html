@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tachyons/4.11.1/tachyons.min.css" integrity="sha256-XiJ+PedljEmPP2VaQzSzekfCZdPr0fpqmh9dY6kpsuQ=" crossorigin="anonymous" />
+
+        <title>Hex</title>
+    </head>
+    <body>
+        <div>
+            <canvas id="main" class="ba br2 ml4 mt4" width="1000" height="900"></canvas>
+        </div>
+        <button id="play-pause">Pause/Resume</button>
+    
+        <pre id="code" class="ma4"></pre>
+
+        <script type="module">
+            import Hex from "./package.mjs";
+
+            const Canvas = document.getElementById("main");
+            const ctx = Canvas.getContext("2d");
+
+            let grid = new Hex.HexGrid(5, 5, 64);
+            console.log(grid);
+
+            Object.values(grid.Tiles).forEach(tile => {
+                let corners = tile.Shape.GetCorners();
+
+                corners.forEach((c, i) => {
+                    let [ x0, y0 ] = corners[ i ];
+                    let [ x1, y1 ] = corners[ i + 1 > 5 ? 0 : i + 1];
+
+                    ctx.strokeStyle = "#000";
+                    ctx.beginPath();
+                    ctx.moveTo(x0, y0);
+                    ctx.lineTo(x1, y1);
+                    ctx.stroke();
+                })
+
+                ctx.font = `14pt mono`;
+                ctx.fillStyle = "#59B300";
+                ctx.fillText(`${ ~~tile.Q }`, tile.Shape.X - tile.Shape.Size / 2, tile.Shape.Y - tile.Shape.Size / 2 + 10);
+                ctx.fillStyle = "#0099E6";
+                ctx.fillText(`${ ~~tile.R }`, tile.Shape.X + tile.Shape.Size / 2 - 10, tile.Shape.Y - tile.Shape.Size / 2 + 10);
+                ctx.fillStyle = "#E61AE6";
+                ctx.fillText(`${ ~~tile.S }`, tile.Shape.X - 10, tile.Shape.Y + tile.Shape.Size / 2 + 10);
+                
+                ctx.font = `10pt mono`;
+                ctx.fillStyle = "#000";
+                // ctx.fillText(`${ ~~tile.Q }, ${ ~~tile.R }, ${ ~~tile.S }`, tile.Shape.X - 15, tile.Shape.Y);
+                ctx.fillText(`${ ~~tile.Shape.X }, ${ ~~tile.Shape.Y }`, tile.Shape.X - 25, tile.Shape.Y);
+                ctx.fillText(`${ ~~tile.Shape.Size }`, tile.Shape.X - 10, tile.Shape.Y + 15);
+            });
+
+
+            Canvas.onclick = e => {
+                let x = e.x - e.target.offsetLeft,
+                    y = e.y - e.target.offsetTop;
+
+                let [ q, r, s ] = Hex.HexGrid.PointToTile(x, y, grid.TileSize);
+                console.log([ x, y ] , [ q, r, s ]);
+
+                // let tile = Object.values(grid.Tiles).filter(tile => tile.Q === q && tile.R === r && tile.S === s);
+                // console.log(tile);
+            };
+        </script>
+    </body>
+</html>

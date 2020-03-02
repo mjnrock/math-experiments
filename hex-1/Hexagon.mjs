@@ -1,14 +1,21 @@
 import Shape from "./Shape.mjs";
-import Point from "./Point.mjs";
 import EnumOrientation from "./EnumOrientation.mjs";
 
 export default class Hexagon extends Shape {
     constructor(x, y, size = 1, orientation = EnumOrientation.FLAT) {
-        super(new Point(x, y));
+        super();
+
+        this.X = x;
+        this.Y = y;
         
         this.Size = size;
-        this.Width = Math.sqrt(3) * size;
-        this.Height = 2 * size;
+        if(orientation === EnumOrientation.FLAT) {
+            this.Width = 2 * size;
+            this.Height = Math.sqrt(3) * size;
+        } else {
+            this.Height = 2 * size;
+            this.Width = Math.sqrt(3) * size;
+        }
         this.Orientation = orientation;
     }
 
@@ -22,9 +29,29 @@ export default class Hexagon extends Shape {
     }
 
     GetCorners(asObject = false) {
-        return Hexagon.CalcCorners(this.Origin.X, this.Origin.Y, this.Size, { isFlatTopped: this.Orientation === EnumOrientation.FLAT, asObject });
+        return Hexagon.CalcCorners(this.X, this.Y, this.Size, { isFlatTopped: this.Orientation === EnumOrientation.FLAT, asObject });
     }
 
+    GetDimensions() {
+        return [
+            this.Width,
+            this.Height
+        ];
+    }
+
+    static GetSize(size, orientation = EnumOrientation.FLAT) {
+        if(orientation === EnumOrientation.FLAT) {
+            return [
+                2 * size,
+                Math.sqrt(3) * size
+            ];
+        } else {
+            return [
+                Math.sqrt(3) * size,
+                2 * size
+            ];
+        }
+    }
     
     static CalcCorner(x, y, size, i = 0, isFlatTopped = true) {
         let deg = isFlatTopped ? [ 0, 60, 120, 180, 240, 300 ] : [ 30, 90, 150, 210, 270, 330 ];
