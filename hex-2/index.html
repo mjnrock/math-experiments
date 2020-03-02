@@ -32,7 +32,8 @@
 
             Object.values(Grid).forEach((tile, index) => {
                 let [ tx, ty ] = tile.ToOffset();
-                let corners = Hex.HexTile.GetPixelCorners(tx, ty, 64, 128, 128);
+                let scale = 100;
+                let corners = Hex.HexTile.GetPixelCorners(tx, ty, scale, scale * 2, scale * 2);
                 console.log(corners);
 
                 corners.forEach((c, i) => {
@@ -46,9 +47,10 @@
                     ctx.stroke();
                 });
 
+                let [ px, py ] = Hex.HexTile.GetPixelOrigin(tx, ty, scale, scale * 2, scale * 2);
                 ctx.fillStyle = "#000";
                 ctx.font = "12pt mono";
-                ctx.fillText(tile.ToOffset(), tile.X, tile.Y);
+                ctx.fillText(`${ ~~px }, ${ ~~py }`, px, py);
             });
 
             Canvas.onclick = e => {

@@ -28,7 +28,7 @@ export default class HexTile {
     }
 
 
-    static GetPixelCorner(px, py, i, scale = 1.0, offX = 0, offY = 0) {
+    static GetPixelCorner(px, py, i, scale = 1.0) {
         let deg = 60 * i;
         let rad = Math.PI / 180 * deg;
 
@@ -42,23 +42,27 @@ export default class HexTile {
 
         for(let i = 0; i < 6; i++) {
             corners.push(HexTile.GetPixelCorner(
-                // tx * 2,
-                // ty * Math.sqrt(3),
                 ...HexTile.GetPixelOrigin(tx, ty, scale, offX, offY),
-
                 i,
-                scale,
-                offX,
-                offY + (tx - (tx & 1)) / 2
+                scale
             ));
         }
 
         return corners;
     }
     static GetPixelOrigin(tx, ty, scale = 1.0, offX = 0, offY = 0) {
+        let w = 2 * scale,
+            h = Math.sqrt(3) * scale;
+
+        let px = tx * w,
+            py = ty * h;
+
+        px -= tx > 0 ? tx * w / 4 : 0;
+        py += !(tx & 1) ? 0 : h / 2;
+
         return [
-            offX + scale * tx * 2,
-            offY + scale * ty * Math.sqrt(3),
+            offX + px,
+            offY + py,
         ];
     }
 };
