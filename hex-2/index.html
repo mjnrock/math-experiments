@@ -27,7 +27,7 @@
             const ctx = Canvas.getContext("2d");
 
             let Grid = {};
-            let size = 5;
+            let size = 20;
             for(let row = 0; row < size; row++) {
                 for(let col = 0; col < size; col++) {
                     Grid[ `${ row }${ col }` ] = new Hex.HexTile(row, col);
@@ -53,7 +53,7 @@
             // let orientation = Hex.Enum.Orientation.ODD_ROW;
             // let orientation = Hex.Enum.Orientation.EVEN_ROW;
             
-            let scale = 128;
+            let scale = 32;
             let offset = 0;//scale * 2;
 
             function Draw(delta) {
@@ -81,31 +81,32 @@
 
 
                     //NOTE Text stuff
-                    let [ px, py ] = Hex.HexTile.TileToPixel(tx, ty, scale, { offX: offset, offY: offset, orientation });
-                    if(Math.sqrt(Math.pow(mx - px, 2) + Math.pow(my - py, 2)) <= scale * Math.sqrt(3) / 2) {
+                    let [ px, py ] = Hex.HexTile.TileToPixel(tx, ty, scale, { offX: offset, offY: offset, orientation }),
+                        check = Math.sqrt(Math.pow(mx - px, 2) + Math.pow(my - py, 2));
+                    if(check <= scale * Math.sqrt(3) / 2) {
                         potentialHexes = [[ tile, [ px, py ]]];
-                    } else if(Math.sqrt(Math.pow(mx - px, 2) + Math.pow(my - py, 2)) <= scale) {
+                    } else if(check <= scale) {
                         potentialHexes.push([ tile, [ px, py ] ]);
                     }
                     
-                    ctx.strokeStyle = "#00f";
-                    ctx.beginPath();
-                    ctx.arc(px, py, scale, 0, 2 * Math.PI);
-                    ctx.stroke();
+                    // ctx.strokeStyle = "#00f";
+                    // ctx.beginPath();
+                    // ctx.arc(px, py, scale, 0, 2 * Math.PI);
+                    // ctx.stroke();
                     
 
-                    ctx.strokeStyle = "#f00";
-                    ctx.beginPath();
-                    ctx.arc(px, py, scale * Math.sqrt(3) / 2, 0, 2 * Math.PI);
-                    ctx.stroke(); 
+                    // ctx.strokeStyle = "#f00";
+                    // ctx.beginPath();
+                    // ctx.arc(px, py, scale * Math.sqrt(3) / 2, 0, 2 * Math.PI);
+                    // ctx.stroke(); 
 
 
-                    ctx.fillStyle = "#000";
-                    ctx.font = "12pt mono";
-                    ctx.fillText(`${ ~~(scale * 2) }, ${ ~~(scale * Math.sqrt(3)) }`, px, py - 20);
-                    ctx.fillText(`${ ~~px }, ${ ~~py }`, px, py);
-                    ctx.fillText(`${ ~~tile.X }, ${ ~~tile.Y }, ${ ~~tile.Z }`, px, py + 20);
-                    ctx.fillText(`${ ~~tx }, ${ ~~ty }`, px, py + 40);
+                    // ctx.fillStyle = "#000";
+                    // ctx.font = "12pt mono";
+                    // ctx.fillText(`${ ~~(scale * 2) }, ${ ~~(scale * Math.sqrt(3)) }`, px, py - 20);
+                    // ctx.fillText(`${ ~~px }, ${ ~~py }`, px, py);
+                    // ctx.fillText(`${ ~~tile.X }, ${ ~~tile.Y }, ${ ~~tile.Z }`, px, py + 20);
+                    // ctx.fillText(`${ ~~tx }, ${ ~~ty }`, px, py + 40);
                 });
 
                 potentialHexes.sort(([ ta, apx, apy ], [ tb, bpx, bpy ]) => {
@@ -131,12 +132,12 @@
                     ctx.closePath();
                     ctx.fill();
 
-                    ctx.fillStyle = "#000";
-                    ctx.font = "12pt mono";
-                    ctx.fillText(`${ ~~(scale * 2) }, ${ ~~(scale * Math.sqrt(3)) }`, px, py - 20);
-                    ctx.fillText(`${ ~~px }, ${ ~~py }`, px, py);
-                    ctx.fillText(`${ ~~DATA.ActiveHex.X }, ${ ~~DATA.ActiveHex.Y }, ${ ~~DATA.ActiveHex.Z }`, px, py + 20);
-                    ctx.fillText(`${ ~~tx }, ${ ~~ty }`, px, py + 40);
+                    // ctx.fillStyle = "#000";
+                    // ctx.font = "12pt mono";
+                    // ctx.fillText(`${ ~~(scale * 2) }, ${ ~~(scale * Math.sqrt(3)) }`, px, py - 20);
+                    // ctx.fillText(`${ ~~px }, ${ ~~py }`, px, py);
+                    // ctx.fillText(`${ ~~DATA.ActiveHex.X }, ${ ~~DATA.ActiveHex.Y }, ${ ~~DATA.ActiveHex.Z }`, px, py + 20);
+                    // ctx.fillText(`${ ~~tx }, ${ ~~ty }`, px, py + 40);
                 }
                     
                 //NOTE Mouse Draw
