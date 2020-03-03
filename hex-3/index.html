@@ -26,6 +26,12 @@
 
             Map.Draw();
 
+            document.addEventListener("click", e => {
+                let x = e.x - e.target.offsetLeft,
+                    y = e.y - e.target.offsetTop;
+
+                console.log(Map.PixelToHex(Map.Point(x, y)));
+            });
             document.addEventListener("DOMMouseScroll", e => {
                 if (e.shiftKey) {
                     if (e.detail > 0) {
