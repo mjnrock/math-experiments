@@ -124,10 +124,10 @@ export default class HexMap {
         const lines = this.GetPixelLines(corners);
 
         //  Do not draw a hexagon if it will bleed over the edge of the map
-        const ptl = this.Point(0, 0),
-            ptr = this.Point(this.Width, 0),
-            pbr = this.Point(this.Width, this.Height),
-            pbl = this.Point(0, this.Height);
+        const ptl = this.Point(0 - 1, 0 - 1),
+            ptr = this.Point(this.Width + 1, 0 - 1),
+            pbr = this.Point(this.Width + 1, this.Height + 1),
+            pbl = this.Point(0 - 1, this.Height + 1);
 
         for (let [la, lb] of lines) {
             if (
@@ -202,8 +202,8 @@ export default class HexMap {
 
             return this.HexRound(this.Hex(q, r));
         } else if (this.HexType === "pointy") {
-            let q = (Math.sqrt(3) / 3 * point.x - 1 / 3 * point.y) / size;
-            let r = (2 / 3 * point.y) / size;
+            let q = (Math.sqrt(3) / 3 * point.x - 1 / 3 * point.y) / this.TileSize;
+            let r = (2 / 3 * point.y) / this.TileSize;
 
             return this.HexRound(this.Hex(q, r));
         }

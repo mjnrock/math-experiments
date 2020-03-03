@@ -21,7 +21,7 @@
             
             const Canvas = document.getElementById("main");
 
-            const Map = new Hex.HexMap(Canvas, { origin: [ Canvas.width / 2, Canvas.height / 2 ], tileSize: 64 });
+            const Map = new Hex.HexMap(Canvas, { origin: [ 100, 100 ], tileSize: 64, hexType: "pointy" });
 
             Map.Draw();
 
