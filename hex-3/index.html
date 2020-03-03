@@ -22,14 +22,35 @@
             const Canvas = document.getElementById("main");
             const ctx = Canvas.getContext("2d");
 
-            function Draw(delta) {
-                ctx.fillStyle = "#fff";
-                ctx.fillRect(0, 0, Canvas.width, Canvas.height);
+            const Map = new Hex.Viewport(Canvas, { origin: [ Canvas.width / 2, Canvas.height / 2 ], tileSize: 64 });
 
-                requestAnimationFrame(Draw);
-            }
+            Map.Draw();
 
-            requestAnimationFrame(Draw);
+            document.addEventListener("DOMMouseScroll", e => {
+                if (e.shiftKey) {
+                    if (e.detail > 0) {
+                        // DOWN
+                        Map.TileSize /= 2;
+                    } else {
+                        // UP
+                        Map.TileSize *= 2;
+                    }
+
+                    Map.Draw();
+                }
+            });
+
+
+            // function Draw(delta) {
+            //     ctx.fillStyle = "#fff";
+            //     ctx.fillRect(0, 0, Canvas.width, Canvas.height);
+
+            //     Map.Draw();
+
+            //     requestAnimationFrame(Draw);
+            // }
+
+            // requestAnimationFrame(Draw);
 
             // Canvas.onclick = e => {
             //     let x = e.x - e.target.offsetLeft,
