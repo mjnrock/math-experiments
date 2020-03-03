@@ -18,6 +18,33 @@ export default class HexMap {
         };
     }
 
+    static Create(canvas, rows, cols, size, { origin = [0, 0], tileSize = 50, hexType = "flat" } = {}) {
+        let { w, h } = HexMap.GetHexDimensions(size, hexType),
+            width = cols * w,
+            height = rows * h;
+
+        return new HexMap(canvas, {
+            width,
+            height,
+            origin,
+            tileSize,
+            hexType
+        });
+    }
+    static GetHexDimensions(size, hexType = "flat") {
+        if(hexType === "flat") {
+            return {
+                w: 2 * size,
+                h: Math.sqrt(3) * size
+            };
+        } else if(hexType === "pointy") {
+            return {
+                w: Math.sqrt(3) * size,
+                h: 2 * size
+            };
+        }
+    }
+
     Draw() {
         const ctx = this.Canvas.getContext("2d");
 
