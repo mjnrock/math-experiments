@@ -6,6 +6,7 @@ export default class Canvas {
         this.IsPlaying = false;
     }
 
+    //* Erasure methods
     clear() {
         this.ctx.clearRect(0, 0, this.Canvas.width, this.Canvas.height);
 
@@ -30,6 +31,8 @@ export default class Canvas {
         this.ctx.fillStyle = pBgColor;
     }
 
+    
+    //* Context meta methods
     prop(...props) {
         if(Array.isArray(props[ 0 ])) {
             props.forEach(([ prop, value ]) => {
@@ -44,6 +47,8 @@ export default class Canvas {
         return this;
     }
 
+    
+    //* Shape methods
     circle(x, y, r, { isFilled = false } = {}) {
         if(isFilled) {
             this.ctx.beginPath();
@@ -135,7 +140,8 @@ export default class Canvas {
         return this;
     }
 
-
+    
+    //* Canvas animation methods
     StartRendering() {
         this.IsPlaying = true;
 
