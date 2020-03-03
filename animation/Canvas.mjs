@@ -105,8 +105,8 @@ export default class Canvas {
     }
 
     _getNgonCorner(x, y, r, i, v, rot = 0) {
-        let deg = 360 / v * i + rot;
-        let rad = Math.PI / 180 * deg;
+        let deg = (360 / v) * i + rot;
+        let rad = (Math.PI / 180) * deg;
 
         return [
             x + r * Math.cos(rad),
