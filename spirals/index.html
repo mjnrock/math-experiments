@@ -34,7 +34,9 @@
                 Canvas.prop({
                     fillStyle: "#00f",
                 }).ngon(30, 500, 500, 260, { rotation, isFilled: true });
-                Canvas.eraseNgon(9, 500, 500, 100, { rotation });
+                Canvas.eraseNgon(9, 500, 500, 150, { rotation });
+                Canvas.square(500, 500, { rc: 50 });
+                Canvas.square(500, 500, { rw: 50 });
                 
                 lastTimestamp = ts;
                 requestAnimationFrame(Draw);

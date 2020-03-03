@@ -17,7 +17,8 @@ export default class Canvas {
         return this;
     }
     eraseNgon(n, x, y, r, { rotation = 0 } = {}) {
-        let pColor = this.ctx.fillStyle;
+        let pColor = this.ctx.strokeStyle;
+        let pBgColor = this.ctx.fillStyle;
 
         this.ctx.globalCompositeOperation = "destination-out";
         this.ctx.fillStyle = "#fff";
@@ -25,7 +26,8 @@ export default class Canvas {
 
         // Reset the composite and revert color
         this.ctx.globalCompositeOperation = "source-over";
-        this.ctx.fillStyle = pColor;
+        this.ctx.strokeStyle = pColor;
+        this.ctx.fillStyle = pBgColor;
     }
 
     prop(...props) {
@@ -77,23 +79,27 @@ export default class Canvas {
         this.ctx.beginPath();
         if(isFilled) {
             this.ctx.fillRect(x, y, w, h);
+            this.ctx.closePath();
+            this.ctx.fill();
+            this.ctx.stroke();
         } else {
             this.ctx.rect(x, y, w, h);
+            this.ctx.closePath();
+            this.ctx.stroke();
         }
-        this.ctx.closePath();
 
         return this;
     }
 
     square(x, y, { rc = null, rw = null, isFilled = false } = {}) {
         if(rc !== null) {
-            this.rect(x, y, rc * Math.cos(Math.PI / 4), rc * Math.sin(Math.PI / 4))
+            this.rect(x, y, 2 * rc * Math.cos(Math.PI / 4), 2 * rc * Math.sin(Math.PI / 4), { isFilled });
         } else if(rw !== null) {
-            this.rect(x, y, rw * 2, rw * 2, { isFilled });
+            this.rect(x, y, 2 * rw, 2 * rw, { isFilled });
         }
     }
 
-    _getCorner(x, y, r, i, v, rot = 0) {
+    _getNgonCorner(x, y, r, i, v, rot = 0) {
         let deg = 360 / v * i + rot;
         let rad = Math.PI / 180 * deg;
 
@@ -105,7 +111,7 @@ export default class Canvas {
     ngon(n, x, y, r, { isFilled = false, rotation = 0 } = {}) {
         let corners = [];
         for (let i = 0; i < n; i++) {
-            corners.push(this._getCorner(x, y, r, i, n, rotation));
+            corners.push(this._getNgonCorner(x, y, r, i, n, rotation));
         }
 
         this.ctx.beginPath();
