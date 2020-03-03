@@ -20,19 +20,30 @@
             import Hex from "./package.mjs";
             
             const Canvas = document.getElementById("main");
-            const ctx = Canvas.getContext("2d");
 
             const Map = new Hex.Viewport(Canvas, { origin: [ Canvas.width / 2, Canvas.height / 2 ], tileSize: 64 });
 
             Map.Draw();
 
-            document.addEventListener("click", e => {
+            Canvas.addEventListener("click", e => {
                 let x = e.x - e.target.offsetLeft,
                     y = e.y - e.target.offsetTop;
 
-                console.log(Map.PixelToHex(Map.Point(x, y)));
+                Map.Tracking.Active = Map.PixelToHex(Map.Point(x, y));
+                Map.Draw();
             });
-            document.addEventListener("DOMMouseScroll", e => {
+            document.addEventListener("mousemove", e => {
+                let x = e.x - e.target.offsetLeft,
+                    y = e.y - e.target.offsetTop;
+
+                if(e.x >= Canvas.offsetLeft && e.x <= Canvas.offsetLeft + Canvas.width && e.y >= Canvas.offsetTop && e.y <= Canvas.offsetTop + Canvas.height) {
+                    Map.Tracking.Hover = Map.PixelToHex(Map.Point(x, y));
+                } else {
+                    Map.Tracking.Hover = null;
+                }
+                Map.Draw();
+            });
+            Canvas.addEventListener("DOMMouseScroll", e => {
                 if (e.shiftKey) {
                     if (e.detail > 0) {
                         // DOWN

@@ -11,6 +11,11 @@ export default class HexMap {
         };
         this.TileSize = tileSize;
         this.HexType = hexType;     // flat|pointy
+
+        this.Tracking = {
+            Active: null,
+            Hover: null
+        };
     }
 
     Draw() {
@@ -22,7 +27,19 @@ export default class HexMap {
         ctx.fillStyle = "#000";
         ctx.strokeStyle = "#000";
         ctx.font = "10pt mono";
+        ctx.lineWidth = 1;
         this.DrawBoard(ctx);
+        
+        if(this.Tracking.Hover) {
+            ctx.strokeStyle = "#42c988";
+            ctx.lineWidth = 3;
+            this.DrawHexagon(ctx, this.Tracking.Hover, true);
+        }
+        if(this.Tracking.Active) {
+            ctx.strokeStyle = "#309364";
+            ctx.lineWidth = 5;
+            this.DrawHexagon(ctx, this.Tracking.Active, true);
+        }
     }
 
     DrawBoard(ctx) {
@@ -41,13 +58,13 @@ export default class HexMap {
                 let neighbors = this.GetCubeNeighbors(cube);
 
                 neighbors.forEach(n => {
-                    if (!closed.includes(JSON.stringify(n))) {
+                    if (!closed.includes(`${ n.x },${ n.y },${ n.z }`)) {
                         frontier.push(n);
                     }
                 });
             }
 
-            closed.push(JSON.stringify(cube));
+            closed.push(`${ cube.x },${ cube.y },${ cube.z }`);
         }
     }
 
@@ -245,7 +262,7 @@ export default class HexMap {
         );
     }
 
-    //  Math.atan2(0, -0) === Math.PI, so all this -0 checking is really just a safeguard for lazy trig inputs
+    //  Math.atan2(0, -0) === Math.PI | All the -0 conversions are to prevent -0 rounding errors
     Point(x, y) {
         return {
             x: x === -0 ? 0 : x,
