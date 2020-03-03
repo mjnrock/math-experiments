@@ -30,15 +30,26 @@ export default class HexMap {
         ctx.lineWidth = 1;
         this.DrawBoard(ctx);
         
-        if(this.Tracking.Hover) {
-            ctx.strokeStyle = "#42c988";
-            ctx.lineWidth = 3;
-            this.DrawHexagon(ctx, this.Tracking.Hover, true);
-        }
-        if(this.Tracking.Active) {
-            ctx.strokeStyle = "#309364";
+        if(this.Tracking.Active) {            
+            if(this.Tracking.Hover) {
+                ctx.strokeStyle = "#8cbef7";
+                ctx.lineWidth = 3;
+                
+                let a = this.AxialToCube(this.Tracking.Active),
+                    b = this.AxialToCube(this.Tracking.Hover),
+                    hexes = this.GetCubeLineHexes(a, b);
+
+                hexes.forEach(hex => this.DrawHexagon(ctx, hex, true));
+            }
+
+            ctx.strokeStyle = "#2963aa";
             ctx.lineWidth = 5;
             this.DrawHexagon(ctx, this.Tracking.Active, true);
+        }
+        if(this.Tracking.Hover) {
+            ctx.strokeStyle = "#4888d6";
+            ctx.lineWidth = 3;
+            this.DrawHexagon(ctx, this.Tracking.Hover, true);
         }
     }
 
@@ -229,6 +240,32 @@ export default class HexMap {
             -hex.q - hex.r,
             hex.r
         );
+    }
+
+    CubeDistance(a, b) {
+        return Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y), Math.abs(a.z - b.z));
+    }
+
+    Lerp(a, b, t) {
+        return a + (b - a) * t;
+    }
+    CubeLerp(a, b, t) {
+        return this.Cube(
+            this.Lerp(a.x, b.x, t), 
+            this.Lerp(a.y, b.y, t),
+            this.Lerp(a.z, b.z, t)
+        );
+    }
+
+    GetCubeLineHexes(a, b) {        
+        var N = this.CubeDistance(a, b);
+        var results = [];
+        
+        for(let i = 0; i <= N; i++) {
+            results.push(this.CubeRound(this.CubeLerp(a, b, 1.0 / N * i)));
+        }
+
+        return results;
     }
 
     HexRound(hex) {
