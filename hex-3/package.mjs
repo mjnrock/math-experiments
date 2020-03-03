@@ -1,5 +1,5 @@
-import Viewport from "./Viewport.mjs";
+import HexMap from "./HexMap.mjs";
 
 export default {
-    Viewport
+    HexMap
 };
