@@ -30,16 +30,27 @@
             const xm = Canvas.Canvas.width / 2;
             const ym = Canvas.Canvas.height / 2;
 
+            const iters = 100;
+            const nsizes = [];
+            const speedCoeff = 10;
+            for(let i = 0; i < iters; i++) {
+                // nsizes.push(2 + ~~(Math.random() * 10 + 2));
+                nsizes.push(4);
+            }
+
             function Draw(ts) {
                 let delta = (ts - lastTimestamp) / 1000;
 
-                rotation += delta * 360;
+                rotation += speedCoeff * delta;
                 rotation = rotation % 360;
 
                 Canvas.clear();
-                Canvas.ngon(15, xm, ym, 260, { rotation, isFilled: true });
-                Canvas.eraseNgon(9, xm, ym, 150, { rotation: -rotation });
-                Canvas.ngon(15, xm, ym, 120, { rotation, isFilled: true });
+                for(let i = 0; i < iters; i++) {
+                    let step = (iters - i) / iters * Canvas.Canvas.width;
+                    Canvas.prop({
+                        fillStyle: i & 1 ? "#2d83d8" : "#fff",
+                    }).ngon(nsizes[ i ], xm, ym, step, { rotation: (i & 1 ? -1 : 1) * rotation, isFilled: true });
+                }
                 
                 lastTimestamp = ts;
                 requestAnimationFrame(Draw);
