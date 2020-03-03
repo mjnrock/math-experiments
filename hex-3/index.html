@@ -29,7 +29,12 @@
                 let x = e.x - e.target.offsetLeft,
                     y = e.y - e.target.offsetTop;
 
-                Map.Tracking.Active = Map.PixelToHex(Map.Point(x, y));
+                let hex = Map.PixelToHex(Map.Point(x, y));
+                if(Map.Tracking.Active && Map.Tracking.Active.q === hex.q && Map.Tracking.Active.r === hex.r) {
+                    Map.Tracking.Active = null;
+                } else {
+                    Map.Tracking.Active = hex;
+                }
                 Map.Draw();
             });
             document.addEventListener("mousemove", e => {
