@@ -56,11 +56,20 @@ export default class HexMap {
         ctx.font = "10pt mono";
         ctx.lineWidth = 1;
         this.DrawBoard(ctx);
+            
+        let rangeHexes = this.CubeRange({ q: 4, r: 1 }, 3);
+        ctx.strokeStyle = "#37ce6a";
+        ctx.lineWidth = 3;
+        rangeHexes.forEach(hex => this.DrawHexagon(ctx, hex, true));
         
-        if(this.Tracking.Active) {            
+        if(this.Tracking.Active) {
+            let rangeHexesB = this.CubeRange(this.Tracking.Active, 2);
+            ctx.strokeStyle = "#ce3d3d";
+            ctx.lineWidth = 3;
+            rangeHexesB.forEach(hex => this.DrawHexagon(ctx, hex, true));
+
             if(this.Tracking.Hover) {
                 ctx.strokeStyle = "#8cbef7";
-                ctx.lineWidth = 3;
                 
                 let a = this.AxialToCube(this.Tracking.Active),
                     b = this.AxialToCube(this.Tracking.Hover),
@@ -72,6 +81,12 @@ export default class HexMap {
             ctx.strokeStyle = "#2963aa";
             ctx.lineWidth = 5;
             this.DrawHexagon(ctx, this.Tracking.Active, true);
+            
+
+            let intRange = this.CubeRangeIntersection({ q: 4, r: 1 }, 3, this.Tracking.Active, 2);
+            ctx.strokeStyle = "#d98bdd";
+            ctx.lineWidth = 5;
+            intRange.forEach(hex => this.DrawHexagon(ctx, hex, true));
         }
         if(this.Tracking.Hover) {
             ctx.strokeStyle = "#4888d6";
@@ -272,15 +287,75 @@ export default class HexMap {
     CubeDistance(a, b) {
         return Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y), Math.abs(a.z - b.z));
     }
+    CubeRange(center, range) {
+        let cube = center;
+        if("q" in cube && "r" in cube) {
+            cube = this.AxialToCube(center);
+        }
+
+        if(range <= 0) {
+            return [
+                center
+            ];
+        }
+
+        let results = [];
+
+        range = ~~range;
+        for(let x = -range; x <= range; x++) {
+            for(let y = Math.max(-range, -x - range); y <= Math.min(range, -x + range); y++) {
+                let z= -x - y;
+
+                results.push(this.CubeAdd(
+                    cube,
+                    this.Cube(x, y, z)
+                ));
+            }
+        }
+
+        return results;
+    }
+    CubeRangeIntersection(a, ar, b, br) {
+        let results = [];
+
+        if("q" in a && "r" in a) {
+            a = this.AxialToCube(a);
+        }
+        if("q" in b && "r" in b) {
+            b = this.AxialToCube(b);
+        }
+        ar = ~~ar;
+        br = ~~br;
+
+        let xmin = Math.max(a.x - ar, b.x - br),
+            xmax = Math.min(a.x + ar, b.x + br);
+        let ymin = Math.max(a.y - ar, b.y - br),
+            ymax = Math.min(a.y + ar, b.y + br);
+        let zmin = Math.max(a.z - ar, b.z - br),
+            zmax = Math.min(a.z + ar, b.z + br);
+
+        for(let x = xmin; x <= xmax; x++) {
+            for(let y = Math.max(ymin, -x - zmax); y <= Math.min(ymax, -x - zmin); y++) {
+                let z = -x - y;
+
+                results.push(this.Cube(x, y, z));
+            }
+        }
+
+        return results;
+    }
 
     Lerp(a, b, t) {
         return a + (b - a) * t;
     }
     CubeLerp(a, b, t) {
-        return this.Cube(
-            this.Lerp(a.x, b.x, t), 
-            this.Lerp(a.y, b.y, t),
-            this.Lerp(a.z, b.z, t)
+        return this.CubeAdd(
+            this.HexType === "pointy" ? this.Cube(1e-6, 2e-6, -3e-6) : this.Cube(1e-6, 2e-6, 3e-6), // These nudges prevent boundary condition errors
+            this.Cube(
+                this.Lerp(b.x, a.x, t), 
+                this.Lerp(b.y, a.y, t),
+                this.Lerp(b.z, a.z, t)
+            )
         );
     }
 

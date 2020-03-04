@@ -34,12 +34,16 @@
 
             const iters = 100;
             const nsizes = [];
-            const speedCoeff = 10;
+            const speedCoeff = 25;
             for(let i = 0; i < iters; i++) {
                 // nsizes.push(2 + ~~(Math.random() * 10 + 2));
                 nsizes.push(4);
             }
 
+            Canvas.prop({
+                fillStyle: "#2d83d8",
+            });
+            let Mouse = [ 0, 0 ];
             function Draw(ts) {
                 let delta = (ts - lastTimestamp) / 1000;
 
@@ -47,17 +51,26 @@
                 rotation = rotation % 360;
 
                 Canvas.clear();
-                for(let i = 0; i < iters; i++) {
-                    let step = (iters - i) / iters * Canvas.Canvas.width;
-                    Canvas.prop({
-                        fillStyle: i & 1 ? "#2d83d8" : "#fff",
-                    }).ngon(nsizes[ i ], xm, ym, step, { rotation: (i & 1 ? -1 : 1) * rotation, isFilled: true });
-                }
+                Canvas.ngon(15, ...Mouse, 350, { rotation: -rotation, isFilled: true });
+                Canvas.eraseNgon(15, ...Mouse, 250, { rotation: rotation });
+                // for(let i = 0; i < iters; i++) {
+                //     let step = (iters - i) / iters * Canvas.Canvas.width;
+                //     Canvas.prop({
+                //         fillStyle: i & 1 ? "#2d83d8" : "#fff",
+                //     }).ngon(nsizes[ i ], xm, ym, step, { rotation: (i & 1 ? -1 : 1) * rotation, isFilled: true });
+                // }
                 
                 lastTimestamp = ts;
                 requestAnimationFrame(Draw);
             }
             requestAnimationFrame(Draw);
+            
+            Canvas.Canvas.onmousemove = e => {
+                let x = e.x - e.target.offsetLeft,
+                    y = e.y - e.target.offsetTop;
+                    
+                Mouse = [ x, y ];
+            }
         </script>
     </body>
 </html>
