@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tachyons/4.11.1/tachyons.min.css" integrity="sha256-XiJ+PedljEmPP2VaQzSzekfCZdPr0fpqmh9dY6kpsuQ=" crossorigin="anonymous" />
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/6.6.1/math.min.js" integrity="sha256-GRICDUAZi4ixXD2USKabeCWS1tT0noAuMFauMmXEmHs=" crossorigin="anonymous"></script>
+
+        <title>Bubble Game</title>
+    </head>
+    <body>
+        <div>
+            <canvas id="main" class="ba br2 ml4 mt4" width="1000" height="900"></canvas>
+        </div>
+        <button id="play-pause">Pause/Resume</button>
+    
+        <pre id="code" class="ma4"></pre>
+
+        <script type="module">
+            import Lib from "./../lib/package.mjs";
+            import Bubbles from "./package.mjs";
+            
+            const Canvas = new Lib.Canvas(document.getElementById("main"));
+            const Game = {
+                IsPaused: null,
+                Player: {
+                    ref: null,
+                    Position: {
+                        X: 0,
+                        Y: 0
+                    }
+                },
+                Physics: {
+                    Friction: 0.95
+                },
+                Entities: [],
+                Loop: {
+                    FPS: 60,
+                    Interval: null,
+                    LastTimestamp: Date.now()
+                },
+                Render: {
+                    LastTimestamp: 0
+                }
+            };
+
+            function Init() {
+                let [ Cw, Ch ] = Canvas.getCenterPoint();
+
+                Game.Player.ref = new Bubbles.Bubble(Cw, Ch, 25);
+
+                Game.Entities.push(Game.Player.ref);
+
+                for(let i = 0; i < 5; i++) {
+                    Game.Entities.push(new Bubbles.Bubble(
+                        Cw + (Math.random() * 500 - 500),
+                        Ch + (Math.random() * 500 - 500),
+                        20
+                    ));
+                }
+            }
+
+            function Tick() {
+                if(!Game.IsPaused) {
+                    let now = Date.now(),
+                        delta = (now - Game.Loop.LastTimestamp) / 1000;
+
+                    Game.Entities.forEach(entity => {
+                        entity.OnTick(delta, Game);
+                        
+                        MapBoundaryCheck(entity);
+                        EntityCollisionCheck(entity);
+                    });
+
+                    Game.Loop.LastTimestamp = now;
+                }
+            }
+
+            function EntityCollisionCheck(entity) {
+                Game.Entities.forEach(ent => {
+                    if(entity.CheckCollision(ent)) {
+                        // console.log(entity, ent);
+                    }
+                });
+            }
+
+            function MapBoundaryCheck(entity) {
+                if(entity.X - entity.GetRadius() < 0) {
+                    entity.X = Math.ceil(entity.GetRadius());
+                    entity.Vx = -entity.Vx;
+                } else if(entity.X + entity.GetRadius() > Canvas.get().width) {
+                    entity.X = Canvas.get().width - Math.ceil(entity.GetRadius());
+                    entity.Vx = -entity.Vx;
+                }
+
+                if(entity.Y - entity.GetRadius() < 0) {
+                    entity.Y = Math.ceil(entity.GetRadius());
+                    entity.Vy = -entity.Vy;
+                } else if(entity.Y + entity.GetRadius() > Canvas.get().height) {
+                    entity.Y = Canvas.get().height - Math.ceil(entity.GetRadius());
+                    entity.Vy = -entity.Vy;
+                }
+            }
+
+            function Draw(ts) {
+                let delta = (ts - Game.Render.LastTimestamp) / 1000;
+
+                Canvas.clear();
+                Game.Entities.forEach(entity => {
+                    Canvas.circle(
+                        entity.X,
+                        entity.Y,
+                        entity.GetRadius()
+                    );
+
+                    Canvas.text(
+                        `${ entity.Vx.toFixed(2) },${ entity.Vy.toFixed(2) }`,
+                        entity.X,
+                        entity.Y + entity.GetRadius() * 1.5
+                    );
+                    Canvas.text(
+                        `${ entity.Collisions }`,
+                        entity.X,
+                        entity.Y
+                    );
+                });
+                
+                Game.Render.LastTimestamp = ts;
+                requestAnimationFrame(Draw);
+            }
+
+            Init();
+            Game.Loop.Interval = setInterval(Tick, 1000 / Game.Loop.FPS);
+            requestAnimationFrame(Draw);
+
+            console.log(Game)
+
+            Canvas.get().onclick = e => {
+                let x = e.x - e.target.offsetLeft,
+                    y = e.y - e.target.offsetTop;
+            }
+
+            document.getElementById("play-pause").onclick = e => {
+                if(Game.IsPaused) {
+                    Game.IsPaused = false;
+                    Game.Loop.LastTimestamp = Date.now();
+                    Game.Loop.Interval = setInterval(Tick, 1000 / Game.Loop.FPS);
+                } else {
+                    Game.IsPaused = true;
+                    clearInterval(Game.Loop.Interval);
+                }
+            }
+        </script>
+    </body>
+</html>
