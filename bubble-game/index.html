@@ -49,7 +49,7 @@
             function Init() {
                 let [ Cw, Ch ] = Canvas.getCenterPoint();
 
-                Game.Player.ref = new Bubbles.Bubble(Cw, Ch, 25);
+                Game.Player.ref = new Bubbles.Bubble(Cw, Ch, 1000, { vx: 0, vy: 0 });
 
                 Game.Entities.push(Game.Player.ref);
 
@@ -57,7 +57,7 @@
                     Game.Entities.push(new Bubbles.Bubble(
                         Cw + (Math.random() * 500 - 500),
                         Ch + (Math.random() * 500 - 500),
-                        20 + (Math.random() * 20 - 10)
+                        1000 + (Math.random() * 200 - 100)
                     ));
                 }
 

@@ -11,7 +11,7 @@ export default class Bubble {
     }
 
     GetRadius() {
-        return this.Mass;
+        return Math.sqrt(this.Mass / Math.PI);
     }
 
     CheckCollision(bubble) {
