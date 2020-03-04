@@ -57,13 +57,25 @@
                     Game.Entities.push(new Bubbles.Bubble(
                         Cw + (Math.random() * 500 - 500),
                         Ch + (Math.random() * 500 - 500),
-                        20
+                        20 + (Math.random() * 20 - 10)
                     ));
                 }
+
+                Canvas.prop({
+                    lineWidth: 3
+                });
             }
 
             function Tick() {
                 if(!Game.IsPaused) {
+                    if(Game.Entities.length === 1) {
+                        if(Game.Entities[ 0 ] === Game.Player.ref) {
+                            GameVictory();
+                        } else {
+                            GameLose();
+                        }
+                    }
+
                     let now = Date.now(),
                         delta = (now - Game.Loop.LastTimestamp) / 1000;
 
@@ -78,10 +90,26 @@
                 }
             }
 
+            function ConsumeEntity(predator, prey) {
+                predator.Mass += prey.Mass;
+
+                Game.Entities = Game.Entities.filter(e => e !== prey);
+            }
             function EntityCollisionCheck(entity) {
                 Game.Entities.forEach(ent => {
-                    if(entity.CheckCollision(ent)) {
-                        // console.log(entity, ent);
+                    if(entity !== ent && entity.CheckCollision(ent)) {
+                        if(entity.Mass > ent.Mass) {
+                            ConsumeEntity(entity, ent);
+                        } else if(entity.Mass < ent.Mass) {
+                            if(entity === Game.Player.ref) {
+                                // Game over
+                                GameLose();
+                            } else {
+                                ConsumeEntity(ent, entity);
+                            }
+                        } else {
+                            // Collision bouncing
+                        }
                     }
                 });
             }
@@ -109,10 +137,30 @@
 
                 Canvas.clear();
                 Game.Entities.forEach(entity => {
+                    if(entity === Game.Player.ref) {
+                        Canvas.prop({
+                            strokeStyle: "#a549c1",
+                            fillStyle: "#e5b7e5",
+                        });
+                    } else if(entity.Mass > Game.Player.ref.Mass) {
+                        Canvas.prop({
+                            strokeStyle: "#d16060",
+                            fillStyle: "#ce9a9a",
+                        });
+                    } else if(entity.Mass <= Game.Player.ref.Mass) {
+                        Canvas.prop({
+                            strokeStyle: "#40a6e5",
+                            fillStyle: "#9ec9e2",
+                        });
+                    }
+
                     Canvas.circle(
                         entity.X,
                         entity.Y,
-                        entity.GetRadius()
+                        entity.GetRadius(),
+                        {
+                            isFilled: true
+                        }
                     );
 
                     Canvas.text(
@@ -144,13 +192,29 @@
 
             document.getElementById("play-pause").onclick = e => {
                 if(Game.IsPaused) {
-                    Game.IsPaused = false;
-                    Game.Loop.LastTimestamp = Date.now();
-                    Game.Loop.Interval = setInterval(Tick, 1000 / Game.Loop.FPS);
+                    ResumeGame();
                 } else {
-                    Game.IsPaused = true;
-                    clearInterval(Game.Loop.Interval);
+                    PauseGame();
                 }
+            }
+
+            function PauseGame() {
+                Game.IsPaused = true;
+                clearInterval(Game.Loop.Interval);
+            }
+            function ResumeGame() {
+                Game.IsPaused = false;
+                Game.Loop.LastTimestamp = Date.now();
+                Game.Loop.Interval = setInterval(Tick, 1000 / Game.Loop.FPS);
+            }
+
+            function GameVictory() {
+                PauseGame();
+                alert("You won, yay.");
+            }
+            function GameLose() {
+                PauseGame();
+                alert("You lost, boo.");
             }
         </script>
     </body>

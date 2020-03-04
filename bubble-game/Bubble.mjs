@@ -16,7 +16,7 @@ export default class Bubble {
 
     CheckCollision(bubble) {
         if(bubble instanceof Bubble) {
-            let result = Math.hypot(bubble.X - this.X, bubble.Y - this.Y) <= this.GetRadius() + bubble.GetRadius();
+            let result = Math.sqrt(Math.pow(bubble.X - this.X, 2) + Math.pow(bubble.Y - this.Y, 2)) <= this.GetRadius() + bubble.GetRadius();
 
             if(result) {
                 this.Collisions += 1;
