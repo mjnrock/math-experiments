@@ -68,14 +68,6 @@
 
             function Tick() {
                 if(!Game.IsPaused) {
-                    if(Game.Entities.length === 1) {
-                        if(Game.Entities[ 0 ] === Game.Player.ref) {
-                            GameVictory();
-                        } else {
-                            GameLose();
-                        }
-                    }
-
                     let now = Date.now(),
                         delta = (now - Game.Loop.LastTimestamp) / 1000;
 
@@ -91,6 +83,10 @@
             }
 
             function ConsumeEntity(predator, prey) {
+                if(prey === Game.Player.ref) {
+                    GameLose();
+                }
+
                 predator.Mass += prey.Mass;
 
                 Game.Entities = Game.Entities.filter(e => e !== prey);

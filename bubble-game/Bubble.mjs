@@ -1,11 +1,11 @@
 export default class Bubble {
-    constructor(x, y, mass = 1) {
+    constructor(x, y, mass = 1, { vx = 50, vy = 50 } = {}) {
         this.X = x;
         this.Y = y;
         this.Mass = mass;
 
-        this.Vx = 500;
-        this.Vy = 500;
+        this.Vx = vx;
+        this.Vy = vy;
 
         this.Collisions = 0;
     }
