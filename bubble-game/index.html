@@ -1,259 +1,316 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tachyons/4.11.1/tachyons.min.css" integrity="sha256-XiJ+PedljEmPP2VaQzSzekfCZdPr0fpqmh9dY6kpsuQ=" crossorigin="anonymous" />
-        
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/6.6.1/math.min.js" integrity="sha256-GRICDUAZi4ixXD2USKabeCWS1tT0noAuMFauMmXEmHs=" crossorigin="anonymous"></script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <title>Bubble Game</title>
-    </head>
-    <body>
-        <div>
-            <canvas id="main" class="ba br2 ml4 mt4" width="1000" height="900"></canvas>
-        </div>
-        <button id="play-pause">Pause/Resume</button>
-    
-        <pre id="code" class="ma4"></pre>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tachyons/4.11.1/tachyons.min.css"
+        integrity="sha256-XiJ+PedljEmPP2VaQzSzekfCZdPr0fpqmh9dY6kpsuQ=" crossorigin="anonymous" />
 
-        <script type="module">
-            import Lib from "./../lib/package.mjs";
-            import Bubbles from "./package.mjs";
-            
-            const Canvas = new Lib.Canvas(document.getElementById("main"));
-            const Game = {
-                IsPaused: null,
-                Player: {
-                    ref: null,
-                    Position: {
-                        X: 0,
-                        Y: 0
-                    }
-                },
-                Physics: {
-                    Friction: 0.95
-                },
-                Entities: [],
-                Loop: {
-                    FPS: 60,
-                    Interval: null,
-                    LastTimestamp: Date.now()
-                },
-                Render: {
-                    LastTimestamp: 0
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/6.6.1/math.min.js"
+        integrity="sha256-GRICDUAZi4ixXD2USKabeCWS1tT0noAuMFauMmXEmHs=" crossorigin="anonymous"></script>
+
+    <title>Bubble Game</title>
+
+    <style>
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .child {
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden;
+            overflow-y: hidden;
+            padding-right: 17px;
+            /* Increase/decrease this value for cross-browser compatibility */
+            box-sizing: content-box;
+            /* So the width will be 100% + 17px */
+        }
+    </style>
+</head>
+
+<body class="bg-gray">
+    <div id="main-container">
+        <canvas id="main" class="bg-silver"></canvas>
+    </div>
+    <button id="play-pause">Pause/Resume</button>
+
+    <pre id="code" class="ma4"></pre>
+
+    <script type="module">
+        import Lib from "./../lib/package.mjs";
+        import Bubbles from "./package.mjs";
+
+        const Canvas = new Lib.Canvas(document.getElementById("main"));
+        Canvas.get().width = window.innerWidth;
+        Canvas.get().height = window.innerHeight;
+
+        const Game = {
+            IsPaused: null,
+            Player: {
+                ref: null,
+                Position: {
+                    X: 0,
+                    Y: 0
                 }
-            };
+            },
+            Physics: {
+                Friction: 0.95
+            },
+            Entities: [],
+            Loop: {
+                FPS: 60,
+                Interval: null,
+                LastTimestamp: Date.now()
+            },
+            Render: {
+                LastTimestamp: 0
+            }
+        };
 
-            function Init() {
-                let [ Cw, Ch ] = Canvas.getCenterPoint();
+        function RandomVelocity(min = -50, max = 50) {
 
-                Game.Player.ref = new Bubbles.Bubble(Cw, Ch, 1000, { vx: 0, vy: 0 });
+        }
 
-                Game.Entities.push(Game.Player.ref);
+        function Init() {
+            let [Cw, Ch] = Canvas.getCenterPoint();
 
-                for(let i = 0; i < 20; i++) {
-                    Game.Entities.push(new Bubbles.Bubble(
-                        Math.random() * Canvas.get().width,
-                        Math.random() * Canvas.get().height,
-                        500 + (Math.random() * 1250 - 250),
-                        { vx: 25 + (Math.random() * 20 - 10), vy: 25 + (Math.random() * 20 - 10) }
-                    ));
-                }
-                for(let i = 0; i < 150; i++) {
-                    Game.Entities.push(new Bubbles.Bubble(
-                        Math.random() * Canvas.get().width,
-                        Math.random() * Canvas.get().height,
-                        50 + (Math.random() * 50 - 10),
-                        { vx: 25 + (Math.random() * 40 - 10), vy: 25 + (Math.random() * 40 - 10) }
-                    ));
-                }
+            Game.Player.ref = new Bubbles.Bubble(Cw, Ch, 1000, { vx: 0, vy: 0 });
 
-                Canvas.prop({
-                    lineWidth: 3
-                });
+            Game.Entities.push(Game.Player.ref);
+
+            for (let i = 0; i < 20; i++) {
+                Game.Entities.push(new Bubbles.Bubble(
+                    Math.random() * Canvas.get().width,
+                    Math.random() * Canvas.get().height,
+                    500 + (Math.random() * 1250 - 250),
+                    { vx: 40 + (Math.random() * 20 - 10), vy: 40 + (Math.random() * 20 - 10) }
+                ));
+            }
+            for (let i = 0; i < 150; i++) {
+                Game.Entities.push(new Bubbles.Bubble(
+                    Math.random() * Canvas.get().width,
+                    Math.random() * Canvas.get().height,
+                    50 + (Math.random() * 50 - 10),
+                    { vx: 50 + (Math.random() * 50 - 50), vy: 50 + (Math.random() * 50 - 50) }
+                ));
             }
 
-            function Tick() {
-                if(!Game.IsPaused) {
-                    if(Game.Entities.length === 1 && Game.Entities[ 0 ] === Game.Player.ref) {
-                        GameVictory();
-                    }
+            Canvas.prop({
+                lineWidth: 3
+            });
+        }
 
-                    let now = Date.now(),
-                        delta = (now - Game.Loop.LastTimestamp) / 1000;
-
-                    Game.Entities.forEach(entity => {
-                        entity.OnTick(delta, Game);
-                        
-                        MapBoundaryCheck(entity);
-                        EntityCollisionCheck(entity);
-                    });
-
-                    Game.Loop.LastTimestamp = now;
-                }
-            }
-
-            function ConsumeEntity(predator, prey) {
-                if(prey === Game.Player.ref) {
-                    GameLose();
+        function Tick() {
+            if (!Game.IsPaused) {
+                if (Game.Entities.length === 1 && Game.Entities[0] === Game.Player.ref) {
+                    GameVictory();
                 }
 
-                let dx = prey.X - predator.X;
-                let dy = prey.Y - predator.Y;
-                
-                predator.Vx += -dx * (prey.Mass / predator.Mass);
-                predator.Vy += -dy * (prey.Mass / predator.Mass);
-                predator.Mass += prey.Mass;
+                let now = Date.now(),
+                    delta = (now - Game.Loop.LastTimestamp) / 1000;
 
-                Game.Entities = Game.Entities.filter(e => e !== prey);
-            }
-            function EntityCollisionCheck(entity) {
-                Game.Entities.forEach(ent => {
-                    if(entity !== ent && entity.CheckCollision(ent)) {
-                        if(entity.Mass > ent.Mass) {
-                            ConsumeEntity(entity, ent);
-                        } else if(entity.Mass < ent.Mass) {
-                            if(entity === Game.Player.ref) {
-                                // Game over
-                                GameLose();
-                            } else {
-                                ConsumeEntity(ent, entity);
-                            }
-                        } else {
-                            // Collision bouncing
-                        }
-                    }
-                });
-            }
-
-            function MapBoundaryCheck(entity) {
-                if(entity.X - entity.GetRadius() < 0) {
-                    entity.X = Math.ceil(entity.GetRadius());
-                    entity.Vx = -entity.Vx;
-                } else if(entity.X + entity.GetRadius() > Canvas.get().width) {
-                    entity.X = Canvas.get().width - Math.ceil(entity.GetRadius());
-                    entity.Vx = -entity.Vx;
-                }
-
-                if(entity.Y - entity.GetRadius() < 0) {
-                    entity.Y = Math.ceil(entity.GetRadius());
-                    entity.Vy = -entity.Vy;
-                } else if(entity.Y + entity.GetRadius() > Canvas.get().height) {
-                    entity.Y = Canvas.get().height - Math.ceil(entity.GetRadius());
-                    entity.Vy = -entity.Vy;
-                }
-            }
-
-            function Draw(ts) {
-                let delta = (ts - Game.Render.LastTimestamp) / 1000;
-
-                Canvas.clear();
                 Game.Entities.forEach(entity => {
-                    if(entity === Game.Player.ref) {
-                        Canvas.prop({
-                            strokeStyle: "#a549c1",
-                            fillStyle: "#e5b7e5",
-                        });
-                    } else if(entity.Mass > Game.Player.ref.Mass) {
-                        Canvas.prop({
-                            strokeStyle: "#d16060",
-                            fillStyle: "#ce9a9a",
-                        });
-                    } else if(entity.Mass <= Game.Player.ref.Mass) {
-                        Canvas.prop({
-                            strokeStyle: "#40a6e5",
-                            fillStyle: "#9ec9e2",
-                        });
-                    }
+                    entity.OnTick(delta, Game);
 
-                    Canvas.circle(
-                        entity.X,
-                        entity.Y,
-                        entity.GetRadius(),
-                        {
-                            isFilled: true
-                        }
-                    );
-
-                    // Canvas.text(
-                    //     `${ entity.Vx.toFixed(2) },${ entity.Vy.toFixed(2) }`,
-                    //     entity.X,
-                    //     entity.Y + entity.GetRadius() * 1.5
-                    // );
+                    MapBoundaryCheck(entity);
+                    EntityCollisionCheck(entity);
                 });
-                
-                Game.Render.LastTimestamp = ts;
-                requestAnimationFrame(Draw);
+
+                Game.Loop.LastTimestamp = now;
+            }
+        }
+
+        function ConsumeEntity(predator, prey) {
+            if (prey === Game.Player.ref) {
+                GameLose();
             }
 
-            Init();
-            Game.Loop.Interval = setInterval(Tick, 1000 / Game.Loop.FPS);
-            requestAnimationFrame(Draw);
+            let dx = prey.X - predator.X;
+            let dy = prey.Y - predator.Y;
 
-            console.log(Game)
+            predator.Vx += -dx * (prey.Mass / predator.Mass);
+            predator.Vy += -dy * (prey.Mass / predator.Mass);
+            predator.Mass += prey.Mass;
 
-            Canvas.get().onclick = e => {
-                let x = e.x - e.target.offsetLeft,
-                    y = e.y - e.target.offsetTop,
-                    player = Game.Player.ref;
-                
-                let dm = Math.ceil(player.Mass * 0.025),
-                    dx = x - player.X,
-                    dy = y - player.Y,
-                    theta = Math.atan2(dy, -dx) + Math.PI,
-                    br = Bubbles.Bubble.CalcRadius(dm);
+            Game.Entities = Game.Entities.filter(e => e !== prey);
+        }
+        function EntityCollisionCheck(entity) {
+            Game.Entities.forEach(ent => {
+                if (entity !== ent && entity.CheckCollision(ent)) {
+                    if (entity.Mass > ent.Mass) {
+                        ConsumeEntity(entity, ent);
+                    } else if (entity.Mass < ent.Mass) {
+                        ConsumeEntity(ent, entity);
+                    } else {
+                        // Collision bouncing
+                    }
+                }
+            });
+        }
 
-                let offx = (player.GetRadius() + br * 2) * Math.cos(theta),
-                    offy = (player.GetRadius() + br * 2) * Math.sin(theta);
-                
-                
-                player.Mass -= dm;
-                player.Vx += Math.sign(-offx) * 15;
-                player.Vy += Math.sign(offy) * 15;
+        function MapBoundaryCheck(entity) {
+            if (entity.X - entity.GetRadius() < 0) {
+                entity.X = Math.ceil(entity.GetRadius());
+                entity.Vx = -entity.Vx;
+            } else if (entity.X + entity.GetRadius() > Canvas.get().width) {
+                entity.X = Canvas.get().width - Math.ceil(entity.GetRadius());
+                entity.Vx = -entity.Vx;
+            }
 
-                AddBubble(
-                    player.X + offx,
-                    player.Y - offy,
-                    dm,
-                    3 * offx,
-                    3 * -offy
+            if (entity.Y - entity.GetRadius() < 0) {
+                entity.Y = Math.ceil(entity.GetRadius());
+                entity.Vy = -entity.Vy;
+            } else if (entity.Y + entity.GetRadius() > Canvas.get().height) {
+                entity.Y = Canvas.get().height - Math.ceil(entity.GetRadius());
+                entity.Vy = -entity.Vy;
+            }
+        }
+
+        function Draw(ts) {
+            let delta = (ts - Game.Render.LastTimestamp) / 1000;
+
+            Canvas.clear();
+            Game.Entities.forEach(entity => {
+                if (entity === Game.Player.ref) {
+                    Canvas.prop({
+                        strokeStyle: "#a549c1",
+                        fillStyle: "#e5b7e5",
+                    });
+                } else if (entity.Mass > Game.Player.ref.Mass) {
+                    Canvas.prop({
+                        strokeStyle: "#d16060",
+                        fillStyle: "#ce9a9a",
+                    });
+                } else if (entity.Mass <= Game.Player.ref.Mass) {
+                    Canvas.prop({
+                        strokeStyle: "#40a6e5",
+                        fillStyle: "#9ec9e2",
+                    });
+                }
+
+                Canvas.circle(
+                    entity.X,
+                    entity.Y,
+                    entity.GetRadius(),
+                    {
+                        isFilled: true
+                    }
                 );
 
-                console.log(offx, offy);
-            }
+                // Canvas.text(
+                //     `${ entity.Vx.toFixed(2) },${ entity.Vy.toFixed(2) }`,
+                //     entity.X,
+                //     entity.Y + entity.GetRadius() * 1.5
+                // );
+            });
 
-            function AddBubble(x, y, mass, vx = 0, vy = 0) {
-                Game.Entities.push(new Bubbles.Bubble(x, y, mass, { vx, vy }));
-            }
+            Game.Render.LastTimestamp = ts;
+            requestAnimationFrame(Draw);
+        }
 
-            document.getElementById("play-pause").onclick = e => {
-                if(Game.IsPaused) {
-                    ResumeGame();
+        Init();
+        Game.Loop.Interval = setInterval(Tick, 1000 / Game.Loop.FPS);
+        requestAnimationFrame(Draw);
+
+        console.log(Game)
+
+        Canvas.get().onclick = e => {
+            let x = e.x - e.target.offsetLeft,
+                y = e.y - e.target.offsetTop,
+                player = Game.Player.ref;
+
+            let dm = Math.ceil(player.Mass * 0.025),
+                dx = x - player.X,
+                dy = y - player.Y,
+                theta = Math.atan2(dy, -dx) + Math.PI,
+                br = Bubbles.Bubble.CalcRadius(dm);
+
+            let offx = (player.GetRadius() + br * 2) * Math.cos(theta),
+                offy = (player.GetRadius() + br * 2) * Math.sin(theta);
+
+
+            player.Mass -= dm;
+            player.Vx += Math.sign(-offx) * 15;
+            player.Vy += Math.sign(offy) * 15;
+
+            AddBubble(
+                player.X + offx,
+                player.Y - offy,
+                dm,
+                3 * offx,
+                3 * -offy
+            );
+        }
+
+        function AddBubble(x, y, mass, vx = 0, vy = 0) {
+            Game.Entities.push(new Bubbles.Bubble(x, y, mass, { vx, vy }));
+        }
+
+        document.getElementById("play-pause").onclick = e => {
+            if (Game.IsPaused) {
+                ResumeGame();
+            } else {
+                PauseGame();
+            }
+        }
+
+        function PauseGame() {
+            Game.IsPaused = true;
+            clearInterval(Game.Loop.Interval);
+        }
+        function ResumeGame() {
+            Game.IsPaused = false;
+            Game.Loop.LastTimestamp = Date.now();
+            Game.Loop.Interval = setInterval(Tick, 1000 / Game.Loop.FPS);
+        }
+
+        function GameVictory() {
+            PauseGame();
+            alert("You won, yay.");
+        }
+        function GameLose() {
+            PauseGame();
+            alert("You lost, boo.");
+        }
+
+
+        window.onresize = e => {
+            ResizeCanvas();
+        };
+        function ResizeCanvas() {
+            Canvas.get().width = window.innerWidth;
+            Canvas.get().height = window.innerHeight;
+        }
+        ResizeCanvas();
+
+        function toggleFullScreen() {
+            if (!document.mozFullScreen && !document.webkitFullScreen) {
+                if (Canvas.get().mozRequestFullScreen) {
+                    Canvas.get().mozRequestFullScreen();
                 } else {
-                    PauseGame();
+                    Canvas.get().webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+                }
+            } else {
+                if (document.mozCancelFullScreen) {
+                    document.mozCancelFullScreen();
+                } else {
+                    document.webkitCancelFullScreen();
                 }
             }
+            ResizeCanvas();
+        }
 
-            function PauseGame() {
-                Game.IsPaused = true;
-                clearInterval(Game.Loop.Interval);
+        window.addEventListener("keydown", function (e) {
+            if (e.keyCode == 13) {
+                toggleFullScreen();
             }
-            function ResumeGame() {
-                Game.IsPaused = false;
-                Game.Loop.LastTimestamp = Date.now();
-                Game.Loop.Interval = setInterval(Tick, 1000 / Game.Loop.FPS);
-            }
+        }, false);
+    </script>
+</body>
 
-            function GameVictory() {
-                PauseGame();
-                alert("You won, yay.");
-            }
-            function GameLose() {
-                PauseGame();
-                alert("You lost, boo.");
-            }
-        </script>
-    </body>
 </html>
