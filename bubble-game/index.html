@@ -53,11 +53,20 @@
 
                 Game.Entities.push(Game.Player.ref);
 
-                for(let i = 0; i < 5; i++) {
+                for(let i = 0; i < 20; i++) {
                     Game.Entities.push(new Bubbles.Bubble(
-                        Cw + (Math.random() * 500 - 500),
-                        Ch + (Math.random() * 500 - 500),
-                        1000 + (Math.random() * 200 - 100)
+                        Math.random() * Canvas.get().width,
+                        Math.random() * Canvas.get().height,
+                        500 + (Math.random() * 1250 - 250),
+                        { vx: 25 + (Math.random() * 20 - 10), vy: 25 + (Math.random() * 20 - 10) }
+                    ));
+                }
+                for(let i = 0; i < 150; i++) {
+                    Game.Entities.push(new Bubbles.Bubble(
+                        Math.random() * Canvas.get().width,
+                        Math.random() * Canvas.get().height,
+                        50 + (Math.random() * 50 - 10),
+                        { vx: 25 + (Math.random() * 40 - 10), vy: 25 + (Math.random() * 40 - 10) }
                     ));
                 }
 
@@ -68,6 +77,10 @@
 
             function Tick() {
                 if(!Game.IsPaused) {
+                    if(Game.Entities.length === 1 && Game.Entities[ 0 ] === Game.Player.ref) {
+                        GameVictory();
+                    }
+
                     let now = Date.now(),
                         delta = (now - Game.Loop.LastTimestamp) / 1000;
 
@@ -87,6 +100,11 @@
                     GameLose();
                 }
 
+                let dx = prey.X - predator.X;
+                let dy = prey.Y - predator.Y;
+                
+                predator.Vx += -dx * (prey.Mass / predator.Mass);
+                predator.Vy += -dy * (prey.Mass / predator.Mass);
                 predator.Mass += prey.Mass;
 
                 Game.Entities = Game.Entities.filter(e => e !== prey);
@@ -159,16 +177,11 @@
                         }
                     );
 
-                    Canvas.text(
-                        `${ entity.Vx.toFixed(2) },${ entity.Vy.toFixed(2) }`,
-                        entity.X,
-                        entity.Y + entity.GetRadius() * 1.5
-                    );
-                    Canvas.text(
-                        `${ entity.Collisions }`,
-                        entity.X,
-                        entity.Y
-                    );
+                    // Canvas.text(
+                    //     `${ entity.Vx.toFixed(2) },${ entity.Vy.toFixed(2) }`,
+                    //     entity.X,
+                    //     entity.Y + entity.GetRadius() * 1.5
+                    // );
                 });
                 
                 Game.Render.LastTimestamp = ts;
@@ -183,7 +196,36 @@
 
             Canvas.get().onclick = e => {
                 let x = e.x - e.target.offsetLeft,
-                    y = e.y - e.target.offsetTop;
+                    y = e.y - e.target.offsetTop,
+                    player = Game.Player.ref;
+                
+                let dm = Math.ceil(player.Mass * 0.025),
+                    dx = x - player.X,
+                    dy = y - player.Y,
+                    theta = Math.atan2(dy, -dx) + Math.PI,
+                    br = Bubbles.Bubble.CalcRadius(dm);
+
+                let offx = (player.GetRadius() + br * 2) * Math.cos(theta),
+                    offy = (player.GetRadius() + br * 2) * Math.sin(theta);
+                
+                
+                player.Mass -= dm;
+                player.Vx += Math.sign(-offx) * 15;
+                player.Vy += Math.sign(offy) * 15;
+
+                AddBubble(
+                    player.X + offx,
+                    player.Y - offy,
+                    dm,
+                    3 * offx,
+                    3 * -offy
+                );
+
+                console.log(offx, offy);
+            }
+
+            function AddBubble(x, y, mass, vx = 0, vy = 0) {
+                Game.Entities.push(new Bubbles.Bubble(x, y, mass, { vx, vy }));
             }
 
             document.getElementById("play-pause").onclick = e => {

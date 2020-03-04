@@ -6,12 +6,9 @@ export default class Bubble {
 
         this.Vx = vx;
         this.Vy = vy;
-
-        this.Collisions = 0;
     }
-
     GetRadius() {
-        return Math.sqrt(this.Mass / Math.PI);
+        return Bubble.CalcRadius(this.Mass);
     }
 
     CheckCollision(bubble) {
@@ -31,5 +28,10 @@ export default class Bubble {
     OnTick(delta, game) {
         this.X += this.Vx * delta;
         this.Y += this.Vy * delta;
+    }
+
+
+    static CalcRadius(mass) {
+        return Math.sqrt(mass / Math.PI);
     }
 };
