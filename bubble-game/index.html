@@ -14,26 +14,57 @@
     <title>Bubble Game</title>
 
     <style>
-        body {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
-
-        .child {
-            width: 100%;
-            height: 100%;
-            overflow-x: hidden;
-            overflow-y: hidden;
-            padding-right: 17px;
-            /* Increase/decrease this value for cross-browser compatibility */
-            box-sizing: content-box;
-            /* So the width will be 100% + 17px */
+        kbd {
+            font-family: Consolas, "Lucida Console", monospace;
+            display: inline-block;
+            border-radius: 3px;
+            padding: 0px 4px;
+            box-shadow: 1px 1px 1px #777;
+            margin: 2px;
+            padding: 5px;
+            font-size: small;
+            vertical-align: text-bottom;
+            background:#eee;
+            font-weight: 500;
+            color: #555;
+            cursor: pointer;
+            font-variant: small-caps;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            letter-spacing: 1px;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
     </style>
 </head>
 
 <body class="bg-gray">
+    <div class="bg-white">
+        <div class="flex align-center justify-center">
+            <h1>Bubble Game</h1>
+        </div>
+        <div class="flex align-center justify-center">
+            <h3>Press <kbd>Enter</kbd> to Start</h3>
+        </div>
+        <div class="flex align-center justify-center">
+            <ul style="list-style: none;">
+                <li><h3>Goal</h3></li>
+                <li>Consume all of the other bubbles</li>
+                <li><h3>Instructions</h3></li>
+                <li>You will emit bubbles in order to propel you forward.  Move by clicking in the <strong>opposite</strong> direction that you want to go</li>
+                <li>Consuming moving bubbles will affect your velocity, more so if they are more massive.</li>
+                <li><h3>Miscellaneous</h3></li>
+                <li>You are the <span style="color: #a549c1;">PURPLE</span></li>
+                <li><span style="color: #d16060;">RED</span> bubbles are bigger than you</li>
+                <li><span style="color: #40a6e5;">BLUE</span> bubbles are smaller than you</li>
+            </ul>
+        </div>
+    </div>
+
     <div id="main-container">
         <canvas id="main" class="bg-silver"></canvas>
     </div>
@@ -213,12 +244,6 @@
             requestAnimationFrame(Draw);
         }
 
-        Init();
-        Game.Loop.Interval = setInterval(Tick, 1000 / Game.Loop.FPS);
-        requestAnimationFrame(Draw);
-
-        console.log(Game)
-
         Canvas.get().onclick = e => {
             let x = e.x - e.target.offsetLeft,
                 y = e.y - e.target.offsetTop,
@@ -307,7 +332,11 @@
 
         window.addEventListener("keydown", function (e) {
             if (e.keyCode == 13) {
-                toggleFullScreen();
+                toggleFullScreen();                
+
+                Init();
+                Game.Loop.Interval = setInterval(Tick, 1000 / Game.Loop.FPS);
+                requestAnimationFrame(Draw);
             }
         }, false);
     </script>
