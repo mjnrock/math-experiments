@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tachyons/4.11.1/tachyons.min.css"
+        integrity="sha256-XiJ+PedljEmPP2VaQzSzekfCZdPr0fpqmh9dY6kpsuQ=" crossorigin="anonymous" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/6.6.1/math.min.js"
+        integrity="sha256-GRICDUAZi4ixXD2USKabeCWS1tT0noAuMFauMmXEmHs=" crossorigin="anonymous"></script>
+
+    <title>Squirrel RPG</title>
+
+    <style>
+        kbd {
+            font-family: Consolas, "Lucida Console", monospace;
+            display: inline-block;
+            border-radius: 3px;
+            padding: 0px 4px;
+            box-shadow: 1px 1px 1px #777;
+            margin: 2px;
+            padding: 5px;
+            font-size: small;
+            vertical-align: text-bottom;
+            background:#eee;
+            font-weight: 500;
+            color: #555;
+            cursor: pointer;
+            font-variant: small-caps;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            letter-spacing: 1px;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+    </style>
+</head>
+
+<body class="bg-gray">
+
+    <div id="main-container">
+        <canvas id="main" class="bg-silver"></canvas>
+    </div>
+
+    <script type="module">
+        import SquirrelRPG from "./package.mjs";
+
+        const Canvas = new SquirrelRPG.Lib.Canvas(document.getElementById("main"));
+        Canvas.get().width = window.innerWidth;
+        Canvas.get().height = window.innerHeight;
+    </script>
+</body>
+
+</html>
