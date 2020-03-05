@@ -107,4 +107,19 @@ export default class KeyboardHandler extends DOMHandler {
         return this;
     }
 
+    onTick(ts) {
+        //* Move the Main Player if there is Keyboard input
+        if(this.Game.$.Handler.Keyboard.hasRight()) {
+            this.Game.$.Manager.Entity.MainPlayer.X += 10;
+        }
+        if(this.Game.$.Handler.Keyboard.hasLeft()) {
+            this.Game.$.Manager.Entity.MainPlayer.X -= 10;
+        }
+        if(this.Game.$.Handler.Keyboard.hasDown()) {
+            this.Game.$.Manager.Entity.MainPlayer.Y += 10;
+        }
+        if(this.Game.$.Handler.Keyboard.hasUp()) {
+            this.Game.$.Manager.Entity.MainPlayer.Y -= 10;
+        }
+    }
 };

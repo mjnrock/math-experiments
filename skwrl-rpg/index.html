@@ -57,6 +57,7 @@
 
         const Game = new SquirrelRPG.Game(Canvas,
             function(ts) {
+                this.$.Handler.Keyboard.onTick(ts);
                 this.$.Manager.Entity.onTick(ts);
             },
             function(ts) {

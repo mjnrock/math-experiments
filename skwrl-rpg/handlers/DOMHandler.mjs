@@ -3,4 +3,6 @@ export default class Handler {
         this.Game = game;
         this.Window = window;
     }
+
+    onTick(ts) {}
 };

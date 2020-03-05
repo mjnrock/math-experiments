@@ -43,19 +43,6 @@ export default class EntityManager {
     }
 
     onTick(ts) {
-        if(this.Game.$.Handler.Keyboard.hasRight()) {
-            this.MainPlayer.X += 10;
-        }
-        if(this.Game.$.Handler.Keyboard.hasLeft()) {
-            this.MainPlayer.X -= 10;
-        }
-        if(this.Game.$.Handler.Keyboard.hasDown()) {
-            this.MainPlayer.Y += 10;
-        }
-        if(this.Game.$.Handler.Keyboard.hasUp()) {
-            this.MainPlayer.Y -= 10;
-        }
-
         Object.values(this.Entities).forEach(ent => ent.onTick(ts));
     }
 
