@@ -55,12 +55,32 @@
         Canvas.get().width = window.innerWidth;
         Canvas.get().height = window.innerHeight;
 
+        const Game = new SquirrelRPG.Game();
+
+        let EntityManager = new SquirrelRPG.Manager.EntityManager(Game, Canvas);
+        let KBHandler = new SquirrelRPG.Handler.KeyboardHandler(Game, window);
+
+        Game.register("Manager", {
+            Entity: EntityManager
+        });
+        Game.register("Handler", {
+            Keyboard: KBHandler
+        });
+
+        Game.Tick.fn = function(ts) {
+            this.$.Manager.Entity.onTick(ts);
+        };
+        Game.Render.fn = function(ts) {
+            Canvas.clear();
+
+            this.$.Manager.Entity.onRender(ts);
+        };
+
         let skwrl = new SquirrelRPG.Entity.Squirrel(...Canvas.getCenterPoint(), `Mr. FuzzyBottoms`);
-        Canvas.circle(...skwrl.Model.getPos(), skwrl.Model.Radius);
 
-        let Game = new SquirrelRPG.Main().Play();
+        Game.$.Manager.Entity.setMainPlayer(skwrl);
 
-        window.onkeydown = e => console.log(e);
+        Game.Play();
     </script>
 </body>
 

@@ -1,15 +1,7 @@
-import Circle from "./../model/Circle.mjs";
+import Entity from "./Entity.mjs";
 
-export default class Squirrel {
+export default class Squirrel extends Entity {
     constructor(x, y, { name = `Squirrel` } = {}) {
-        this.X = x;
-        this.Y = y;
-        this.Model = new Circle(x, y, 50);
-
-        this.Name = name;
-    }
-
-    isCollision(shape) {
-        return this.Model.isCollision(shape);
+        super(x, y, { name });
     }
 };

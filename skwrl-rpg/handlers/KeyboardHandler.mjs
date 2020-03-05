@@ -2,8 +2,8 @@ import Bitwise from "./../lib/Bitwise.mjs";
 import DOMHandler from "./DOMHandler.mjs";
 
 export default class KeyboardHandler extends DOMHandler {
-    constructor(window, game, { press = null, down = null, up = null } = {}) {
-        super(window, game);
+    constructor(game, window, { press = null, down = null, up = null } = {}) {
+        super(game, window);
 
         window.onkeypress = this.onKeyPress.bind(this);
         window.onkeydown = this.onKeyDown.bind(this);
@@ -77,9 +77,14 @@ export default class KeyboardHandler extends DOMHandler {
         Object.keys(this.KeyMapping).forEach(key => {
             if(this.KeyMapping[ key ].includes(e.which)) {
                 if(e.type === "keyup") {
-                    Bitwise.remove(this.Directions.Mask, this.Directions.Flags[ key ]);
+                    console.log(0)
+                    this.Directions.Mask = Bitwise.remove(this.Directions.Mask, this.Directions.Flags[ key ]);
                 } else if(e.type === "keydown") {
-                    Bitwise.add(this.Directions.Mask, this.Directions.Flags[ key ]);
+                    console.log(1)
+                    this.Directions.Mask = Bitwise.add(this.Directions.Mask, this.Directions.Flags[ key ]);
+                } else if(e.type === "keypress") {
+                    console.log(2)
+                    this.Directions.Mask = Bitwise.add(this.Directions.Mask, this.Directions.Flags[ key ]);
                 }
             }
         });
@@ -92,7 +97,7 @@ export default class KeyboardHandler extends DOMHandler {
 
         this.updateDirectionMask(e);
         if(this.Handlers.onKeyPress) {
-            this.Handlers.onKeyPress(e);
+            this.Handlers.onKeyPress.call(this, e);
         }
     
         return this;
@@ -102,8 +107,9 @@ export default class KeyboardHandler extends DOMHandler {
         e.preventDefault();
 
         this.updateDirectionMask(e);
+        console.log(this.Directions.Mask)
         if(this.Handlers.onKeyDown) {
-            this.Handlers.onKeyDown(e);
+            this.Handlers.onKeyDown.call(this, e);
         }
     
         return this;
@@ -114,7 +120,7 @@ export default class KeyboardHandler extends DOMHandler {
 
         this.updateDirectionMask(e);
         if(this.Handlers.onKeyUp) {
-            this.Handlers.onKeyUp(e);
+            this.Handlers.onKeyUp.call(this, e);
         }
     
         return this;

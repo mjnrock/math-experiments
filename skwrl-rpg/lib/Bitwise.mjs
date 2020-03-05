@@ -14,6 +14,6 @@ export default {
         return base;
     },    
     has(base, flag) {
-        return base & flag;
+        return !!(base & flag);
     }
 }

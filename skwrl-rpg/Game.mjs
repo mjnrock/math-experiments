@@ -1,4 +1,4 @@
-export default class Main {
+export default class Game {
     constructor(tick, render) {
         this.IsRunning = false;
 
@@ -12,6 +12,23 @@ export default class Main {
             fn: render,
             LastTimestamp: Date.now()
         };
+
+        this.Registry = {};
+    }
+
+    get $() {
+        return this.Registry;
+    }
+
+    register(namespace, object) {
+        this.Registry[ namespace ] = object;
+        
+        return this;
+    }
+    unregister(namespace) {
+        delete this.Registry[ namespace ];
+
+        return this;
     }
 
     handleTick(ts) {
@@ -19,7 +36,7 @@ export default class Main {
             let delta = (ts - this.Tick.LastTimestamp) / 1000;
 
             if(this.Tick.fn) {
-                this.Tick.fn(delta);
+                this.Tick.fn.call(this, delta);
             }
 
             this.Tick.LastTimestamp = ts;
@@ -30,7 +47,7 @@ export default class Main {
             let delta = (ts - this.Render.LastTimestamp) / 1000;
 
             if(this.Render.fn) {
-                this.Render.fn(delta);
+                this.Render.fn.call(this, delta);
             }
 
             this.Render.LastTimestamp = ts;

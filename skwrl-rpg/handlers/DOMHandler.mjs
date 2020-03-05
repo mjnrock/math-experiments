@@ -1,6 +1,6 @@
 export default class Handler {
-    constructor(window, game) {
-        this.Window = window;
+    constructor(game, window) {
         this.Game = game;
+        this.Window = window;
     }
 };
