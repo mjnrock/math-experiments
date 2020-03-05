@@ -79,12 +79,9 @@
         Game.$.Manager.Entity.setMainPlayer(skwrl);
 
 
-        Canvas.loadImage("skwrl", "./assets/skwrl.png");
-
-        setTimeout(() => 
-            Game.Play(),
-            1000
-        );
+        Canvas.loadImage("skwrl", "./assets/skwrl.png").then(data => {
+            Game.Play();
+        });
     </script>
 </body>
 

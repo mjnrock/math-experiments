@@ -9,14 +9,16 @@ export default class Canvas {
         this.Images = {};
     }
 
-    async loadImage(name, uri) {
-        let img = new Image();
-        img.onload = () => {
-            this.Images[ name ] = img;
-        }
-        img.src = uri;
-        
-        return this;
+    loadImage(name, uri) {        
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.addEventListener("load", () => {
+                this.Images[ name ] = img;
+                resolve(img);
+            });
+            img.addEventListener("error", err => reject(err));
+            img.src = uri;
+        });
     }
 
     get() {
