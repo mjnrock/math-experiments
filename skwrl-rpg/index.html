@@ -55,8 +55,12 @@
         Canvas.get().width = window.innerWidth;
         Canvas.get().height = window.innerHeight;
 
-        let skwrl = new SquirrelRPG.
-        Canvas.circle(50, 50, 25);
+        let skwrl = new SquirrelRPG.Entity.Squirrel(...Canvas.getCenterPoint(), `Mr. FuzzyBottoms`);
+        Canvas.circle(...skwrl.Model.getPos(), skwrl.Model.Radius);
+
+        let Game = new SquirrelRPG.Main().Play();
+
+        window.onkeydown = e => console.log(e);
     </script>
 </body>
 
