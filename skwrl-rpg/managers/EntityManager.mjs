@@ -67,7 +67,7 @@ export default class EntityManager {
                     tileCol = 0;
                 }
 
-                this.Game.Canvas.tile("skwrl", tileSize, tileCol * tileSize, tileRow * tileSize, ...ent.Model.getPos());
+                this.Game.Canvas.tile("skwrl-01", tileSize, tileCol * tileSize, tileRow * tileSize, ...ent.Model.getPos());
             }
         });
     }

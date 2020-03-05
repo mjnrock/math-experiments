@@ -93,6 +93,5 @@ export default class MouseHandler extends DOMHandler {
         return this;
     }
 
-    onTick(ts) {
-    }
+    onTick(ts) {}
 };

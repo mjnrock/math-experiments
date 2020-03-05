@@ -20,6 +20,11 @@ export default class Canvas {
             img.src = uri;
         });
     }
+    loadImages(arr) {
+        let promises = arr.map(([ name, uri ]) => this.loadImage(name, uri));
+
+        return Promise.all(promises);
+    }
 
     get() {
         return this.canvas;
