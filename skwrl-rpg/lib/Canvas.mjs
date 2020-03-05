@@ -183,8 +183,14 @@ export default class Canvas {
         return this;
     }
 
-    image(name, x, y) {
-        this.ctx.drawImage(this.Images[ name ], x, y);
+    image(name, ...args) {
+        this.ctx.drawImage(this.Images[ name ], ...args);
+
+        return this;
+    }
+
+    tile(name, size, sx, sy, dx, dy) {
+        this.ctx.drawImage(this.Images[ name ], sx, sy, size, size, dx, dy, size, size);
 
         return this;
     }

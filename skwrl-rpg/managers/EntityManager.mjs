@@ -50,7 +50,11 @@ export default class EntityManager {
         Object.values(this.Entities).forEach(ent => {
             if(ent.Model instanceof Circle) {
                 // this.Game.Canvas.circle(...ent.Model.getPos(), ent.Model.Radius);
-                this.Game.Canvas.image("skwrl", ...ent.Model.getPos());
+                if(this.Game.$.Handler.Keyboard.hasRight()) {
+                    this.Game.Canvas.tile("skwrl", 64, 64, 0, ...ent.Model.getPos());
+                } else {
+                    this.Game.Canvas.tile("skwrl", 64, 0, 0, ...ent.Model.getPos());
+                }
             }
         });
     }
