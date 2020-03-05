@@ -2,9 +2,8 @@ import Circle from "./../model/Circle.mjs";
 import Entity from "./../entity/Entity.mjs";
 
 export default class EntityManager {
-    constructor(game, canvas) {
+    constructor(game) {
         this.Game = game;
-        this.Canvas = canvas;
         this.Entities = {};
 
         this.MainPlayer = null;
@@ -63,7 +62,7 @@ export default class EntityManager {
     onRender(ts) {
         Object.values(this.Entities).forEach(ent => {
             if(ent.Model instanceof Circle) {
-                this.Canvas.circle(...ent.Model.getPos(), ent.Model.Radius);
+                this.Game.Canvas.circle(...ent.Model.getPos(), ent.Model.Radius);
             }
         });
     }

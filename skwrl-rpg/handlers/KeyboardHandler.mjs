@@ -2,15 +2,13 @@ import Bitwise from "./../lib/Bitwise.mjs";
 import DOMHandler from "./DOMHandler.mjs";
 
 export default class KeyboardHandler extends DOMHandler {
-    constructor(game, window, { press = null, down = null, up = null } = {}) {
+    constructor(game, window, { down = null, up = null } = {}) {
         super(game, window);
 
-        window.onkeypress = this.onKeyPress.bind(this);
         window.onkeydown = this.onKeyDown.bind(this);
         window.onkeyup = this.onKeyUp.bind(this);
 
         this.Handlers = {
-            onKeyPress: press,
             onKeyDown: down,
             onKeyUp: up
         };
@@ -77,13 +75,8 @@ export default class KeyboardHandler extends DOMHandler {
         Object.keys(this.KeyMapping).forEach(key => {
             if(this.KeyMapping[ key ].includes(e.which)) {
                 if(e.type === "keyup") {
-                    console.log(0)
                     this.Directions.Mask = Bitwise.remove(this.Directions.Mask, this.Directions.Flags[ key ]);
                 } else if(e.type === "keydown") {
-                    console.log(1)
-                    this.Directions.Mask = Bitwise.add(this.Directions.Mask, this.Directions.Flags[ key ]);
-                } else if(e.type === "keypress") {
-                    console.log(2)
                     this.Directions.Mask = Bitwise.add(this.Directions.Mask, this.Directions.Flags[ key ]);
                 }
             }
@@ -92,22 +85,10 @@ export default class KeyboardHandler extends DOMHandler {
         return this;
     }
 
-    onKeyPress(e) {
-        e.preventDefault();
-
-        this.updateDirectionMask(e);
-        if(this.Handlers.onKeyPress) {
-            this.Handlers.onKeyPress.call(this, e);
-        }
-    
-        return this;
-    }
-
     onKeyDown(e) {
         e.preventDefault();
 
         this.updateDirectionMask(e);
-        console.log(this.Directions.Mask)
         if(this.Handlers.onKeyDown) {
             this.Handlers.onKeyDown.call(this, e);
         }

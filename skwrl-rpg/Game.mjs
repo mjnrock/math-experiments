@@ -1,6 +1,7 @@
 export default class Game {
-    constructor(tick, render) {
+    constructor(canvas, tick, render) {
         this.IsRunning = false;
+        this.Canvas = canvas;
 
         this.Tick = {
             fn: tick,
