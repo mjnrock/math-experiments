@@ -2,8 +2,21 @@ export default class Canvas {
     constructor(canvas) {
         this.canvas = canvas;
         this.ctx = canvas.getContext("2d");
+        this.ctx.scale(2, 2);
 
         this.IsPlaying = false;
+
+        this.Images = {};
+    }
+
+    async loadImage(name, uri) {
+        let img = new Image();
+        img.onload = () => {
+            this.Images[ name ] = img;
+        }
+        img.src = uri;
+        
+        return this;
     }
 
     get() {
@@ -164,6 +177,12 @@ export default class Canvas {
         this.ctx.font = font;
         this.ctx.fillText(txt, xn, yn);
         this.ctx.fillStyle = pColor;
+
+        return this;
+    }
+
+    image(name, x, y) {
+        this.ctx.drawImage(this.Images[ name ], x, y);
 
         return this;
     }
