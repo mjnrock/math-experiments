@@ -49,12 +49,25 @@ export default class EntityManager {
     onRender(ts) {
         Object.values(this.Entities).forEach(ent => {
             if(ent.Model instanceof Circle) {
-                // this.Game.Canvas.circle(...ent.Model.getPos(), ent.Model.Radius);
-                if(this.Game.$.Handler.Keyboard.hasRight()) {
-                    this.Game.Canvas.tile("skwrl", 64, 64, 0, ...ent.Model.getPos());
+                //? This state management here is just for testing
+                let state = this.Game.$.Handler.Mouse.hasLeft() ? "ATTACKING" : "NORMAL",
+                    tileSize = 64,
+                    tileRow = 0,
+                    tileCol = 0;
+
+                if(state === "ATTACKING") {
+                    tileRow = 1;
                 } else {
-                    this.Game.Canvas.tile("skwrl", 64, 0, 0, ...ent.Model.getPos());
+                    tileRow = 0;
                 }
+                
+                if(this.Game.$.Manager.Entity.MainPlayer.Direction === 1) {
+                    tileCol = 1;
+                } else {
+                    tileCol = 0;
+                }
+
+                this.Game.Canvas.tile("skwrl", tileSize, tileCol * tileSize, tileRow * tileSize, ...ent.Model.getPos());
             }
         });
     }

@@ -6,6 +6,7 @@ export default class Entity {
         this.UUID = GenerateUUID();
         this._X = x;
         this._Y = y;
+        this._Direction = -1;
         this.Model = model || new Circle(x, y, 50);
 
         this.Name = name;
@@ -19,6 +20,9 @@ export default class Entity {
         get Y() {
             return this._Y;
         }
+        get Direction() {
+            return this._Direction;
+        }
 
         set X(x) {
             this._X = x;
@@ -31,6 +35,11 @@ export default class Entity {
             this.Model.Y = y;
 
             return this._Y;
+        }
+        set Direction(dir) {
+            this._Direction = dir;
+
+            return this._Direction;
         }
 
     isCollision(shape) {

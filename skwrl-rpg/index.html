@@ -67,11 +67,13 @@
             }
         );
 
+
         Game.register("Manager", {
             Entity: new SquirrelRPG.Manager.EntityManager(Game)
         });
         Game.register("Handler", {
-            Keyboard: new SquirrelRPG.Handler.KeyboardHandler(Game, window)
+            Keyboard: new SquirrelRPG.Handler.KeyboardHandler(Game, window),
+            Mouse: new SquirrelRPG.Handler.MouseHandler(Game, window),
         });
 
         let skwrl = new SquirrelRPG.Entity.Squirrel(...Canvas.getCenterPoint(), `Mr. FuzzyBottoms`);
