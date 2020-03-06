@@ -139,7 +139,7 @@ export default class EntityManager {
                     strokeStyle: "#f00"
                 })
                 this.Game.Canvas.circle(ent.X, ent.Y, ent.Model.Radius);
-            }a
+            }
         });
     }
 }
