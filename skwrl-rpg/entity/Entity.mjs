@@ -70,5 +70,9 @@ export default class Entity {
         return this.Model.isCollision(shape);
     }
 
+    shouldDie() {
+        return false;
+    }
+    
     onTick(ts) {}
 };

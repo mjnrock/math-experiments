@@ -58,21 +58,15 @@ export default class EntityManager extends Manager {
                 if(ent.X < 0 || ent.X > this.Game.Canvas.get().width || ent.Y < 0 || ent.Y > this.Game.Canvas.get().height) {
                     this.unregister(ent);
                 }
-
-                for(let i = 0; i < Entities.length; i++) {
-                    let tar = Entities[ i ];
-                    this.Game.$.Manager.Collision.checkCollision(ent, tar);
-                    // if(tar instanceof Entity.Creature && ent !== tar && tar.IsCollidable && ent.Model.isCollision(tar.Model)) {
-                    //     this.register(new Entity.Effect(Enum.Effect.POOF, tar.X, tar.Y));
-                    //     this.unregister(ent);
-                    //     this.unregister(tar);
-                    // }
-                };
             } else if(ent instanceof Entity.Effect) {
                 if(ent.shouldDie()) {
                     this.unregister(ent);
                 }
             }
+
+            Entities.forEach(tar => {
+                this.Game.$.Manager.Collision.checkCollision(ent, tar);
+            });
 
             if(ent.Vx) {
                 ent.X += ent.Vx * ts;
@@ -92,7 +86,11 @@ export default class EntityManager extends Manager {
                 }
             }
 
-            ent.onTick(ts);
+            if(ent.shouldDie()) {
+                this.unregister(ent);
+            } else {
+                ent.onTick(ts);
+            }
         });
     }
 
