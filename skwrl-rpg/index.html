@@ -69,7 +69,8 @@
 
 
             Game.register("Manager", {
-                Entity: new SquirrelRPG.Manager.EntityManager(Game)
+                Entity: new SquirrelRPG.Manager.EntityManager(Game, window),
+                Physics: new SquirrelRPG.Manager.PhysicsManager(Game, window),
             });
             Game.register("Handler", {
                 Keyboard: new SquirrelRPG.Handler.KeyboardHandler(Game, window),

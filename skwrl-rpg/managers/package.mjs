@@ -1,5 +1,10 @@
+import Manager from "./Manager.mjs";
 import EntityManager from "./EntityManager.mjs";
+import PhysicsManager from "./PhysicsManager.mjs";
 
 export default {
-    EntityManager
+    Manager,
+
+    EntityManager,
+    PhysicsManager
 };

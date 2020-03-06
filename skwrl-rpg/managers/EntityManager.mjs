@@ -1,12 +1,14 @@
+import Manager from "./Manager.mjs";
+
 import Entity from "./../entity/package.mjs";
 import Model from "./../model/package.mjs";
 import Enum from "./../enum/package.mjs";
 
-export default class EntityManager {
-    constructor(game) {
-        this.Game = game;
-        this.Entities = {};
+export default class EntityManager extends Manager {
+    constructor(game, window) {
+        super(game, window);
 
+        this.Entities = {};
         this.MainPlayer = null;
         this.Players = {}
     }
@@ -82,7 +84,7 @@ export default class EntityManager {
                 ent.Y += ent.Vy * ts;
 
                 if(ent.Vy !== 0) {
-                    ent.Vy += ts * this.Game.Physics.GRAVITY;
+                    ent.Vy += ts * this.Game.$.Manager.Physics.Constants.GRAVITY;
                 }
             }
 

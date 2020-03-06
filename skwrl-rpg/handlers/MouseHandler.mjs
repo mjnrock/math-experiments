@@ -91,7 +91,7 @@ export default class MouseHandler extends DOMHandler {
             );
 
             projectile.Direction = this.Game.$.Manager.Entity.MainPlayer.Direction;
-            projectile.Vx = projectile.Direction * this.Game.Physics.PROJECTILE;
+            projectile.Vx = projectile.Direction * this.Game.$.Manager.Physics.Constants.PROJECTILE;
             projectile.Model.Radius = 16;
 
             this.Game.$.Manager.Entity.register(projectile);

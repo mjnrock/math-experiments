@@ -109,7 +109,7 @@ export default class KeyboardHandler extends DOMHandler {
         this.updateStateMask(e);
 
         if(this.Game.$.Manager.Entity.MainPlayer.Vy === 0 && this.hasJump()) {
-            this.Game.$.Manager.Entity.MainPlayer.Vy += this.Game.Physics.JUMP;
+            this.Game.$.Manager.Entity.MainPlayer.Vy += this.Game.$.Manager.Physics.Constants.JUMP;
         }
 
         if(this.Handlers.onKeyDown) {
