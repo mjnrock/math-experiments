@@ -48,7 +48,7 @@ export default class EntityManager extends Manager {
         return this;
     }
 
-    onTick(ts) {
+    onTick(dt) {
         const Entities = Object.values(this.Entities);
 
         let testNudge = -200;
@@ -71,7 +71,7 @@ export default class EntityManager extends Manager {
             //? Physics checks
             //TODO Send to PhysicsManager
             if(ent.Vx) {
-                ent.X += ent.Vx * ts;
+                ent.X += ent.Vx * dt;
             }
 
             if(ent.Vy > 0 && ent.Y > this.Game.Canvas.get().height + testNudge - ent.Model.Radius / 2) {
@@ -81,19 +81,21 @@ export default class EntityManager extends Manager {
                     ent.Y = this.Game.Canvas.get().height + testNudge - ent.Model.Radius / 2;
                 }
             } else {
-                ent.Y += ent.Vy * ts;
+                ent.Y += ent.Vy * dt;
 
                 if(ent.Vy !== 0) {
-                    ent.Vy += ts * this.Game.$.Manager.Physics.Constants.GRAVITY;
+                    ent.Vy += dt * this.Game.$.Manager.Physics.Constants.GRAVITY;
                 }
             }
+            this.Game.$.Manager.Physics.applyGravity(dt, ent);
+            this.Game.$.Manager.Physics.updatePosition(dt, ent);
 
 
             //? Live or Die checks
             if(ent.shouldDie()) {
                 this.unregister(ent);
             } else {
-                ent.onTick(ts);
+                ent.onTick(dt);
             }
         });
     }

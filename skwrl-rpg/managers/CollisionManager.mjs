@@ -8,11 +8,19 @@ export default class CollisionManager extends Manager {
     }
 
     add(entityFromClasses, entityToClasses, handler) {
-        this.Handlers.push({
-            from: entityFromClasses,
-            to: entityToClasses,
-            handler: handler
-        });
+        if(arguments.length === 1 && typeof entityFromClasses === "function") {        
+            this.Handlers.push({
+                from: [],
+                to: [],
+                handler: entityFromClasses
+            });
+        } else {
+            this.Handlers.push({
+                from: entityFromClasses,
+                to: entityToClasses,
+                handler: handler
+            });
+        }
 
         return this;
     }
@@ -47,6 +55,14 @@ export default class CollisionManager extends Manager {
         if(entFrom !== entTo && entTo.IsCollidable && entFrom.Model.isCollision(entTo.Model)) {
             this.onCollision(entFrom, entTo);
 
+            return true;
+        }
+
+        return false;
+    }
+
+    isCollision(entFrom, entTo) {
+        if(entFrom !== entTo && entTo.IsCollidable && entFrom.Model.isCollision(entTo.Model)) {
             return true;
         }
 

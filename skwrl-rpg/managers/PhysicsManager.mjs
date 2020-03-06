@@ -8,7 +8,18 @@ export default class PhysicsManager extends Manager {
             PROJECTILE: 1000,
             JUMP: -800,
             GRAVITY: 2000
-        }
+        };
+    }
+
+    updatePosition(dt, entity) {
+        entity.X += entity.Vx * dt;
+        entity.Y += entity.Vy * dt;
+
+        return this;
+    }
+
+    applyGravity(dt, entity) {
+        entity.Vy += this.Constants.GRAVITY * dt;
     }
 
     onTick(ts) {}

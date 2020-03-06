@@ -70,7 +70,10 @@ export default class Game {
     Play() {
         this.IsRunning = true;
         this.Tick.Interval = setInterval(() => this.handleTick(Date.now()), 1000 / this.Tick.FPS);
-        window.requestAnimationFrame(this.handleRender.bind(this));
+
+        if(window) {
+            window.requestAnimationFrame(this.handleRender.bind(this));
+        }
 
         return this;
     }
