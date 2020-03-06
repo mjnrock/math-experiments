@@ -56,11 +56,9 @@ export default class EntityManager {
                 for(let i = 0; i < Entities.length; i++) {
                     let tar = Entities[ i ];
                     if(ent !== tar && tar.IsCollidable && ent.Model.isCollision(tar.Model)) {
-                        if(tar instanceof Entity.Ninja) {
-                            this.register(new Entity.Effect(tar.X, tar.Y));
-                            this.unregister(ent);
-                            this.unregister(tar);
-                        }
+                        this.register(new Entity.Effect(tar.X, tar.Y));
+                        this.unregister(ent);
+                        this.unregister(tar);
                     }
                 };
             } else if(ent instanceof Entity.Effect) {
