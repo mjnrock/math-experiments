@@ -15,10 +15,20 @@ export default class Game {
         };
 
         this.Registry = {};
+        this.Helpers = {};
     }
 
+    get _() {
+        return this.Helpers;
+    }
     get $() {
         return this.Registry;
+    }
+
+    prop(key, value) {
+        this.Helpers[ key ] = value;
+
+        return this;
     }
 
     register(namespace, object) {

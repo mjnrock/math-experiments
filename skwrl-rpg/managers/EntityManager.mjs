@@ -11,6 +11,9 @@ export default class EntityManager extends Manager {
         this.Entities = {};
         this.MainPlayer = null;
         this.Players = {}
+
+
+        game.prop("getPlayer", (index = 0) => Object.values(this.Players)[ index ]);
     }
 
     setMainPlayer(player) {
@@ -58,11 +61,12 @@ export default class EntityManager extends Manager {
 
                 for(let i = 0; i < Entities.length; i++) {
                     let tar = Entities[ i ];
-                    if(tar instanceof Entity.Creature && ent !== tar && tar.IsCollidable && ent.Model.isCollision(tar.Model)) {
-                        this.register(new Entity.Effect(Enum.Effect.POOF, tar.X, tar.Y));
-                        this.unregister(ent);
-                        this.unregister(tar);
-                    }
+                    this.Game.$.Manager.Collision.checkCollision(ent, tar);
+                    // if(tar instanceof Entity.Creature && ent !== tar && tar.IsCollidable && ent.Model.isCollision(tar.Model)) {
+                    //     this.register(new Entity.Effect(Enum.Effect.POOF, tar.X, tar.Y));
+                    //     this.unregister(ent);
+                    //     this.unregister(tar);
+                    // }
                 };
             } else if(ent instanceof Entity.Effect) {
                 if(ent.shouldDie()) {

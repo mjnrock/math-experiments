@@ -71,6 +71,7 @@
             Game.register("Manager", {
                 Entity: new SquirrelRPG.Manager.EntityManager(Game, window),
                 Physics: new SquirrelRPG.Manager.PhysicsManager(Game, window),
+                Collision: new SquirrelRPG.Manager.CollisionManager(Game, window),
             });
             Game.register("Handler", {
                 Keyboard: new SquirrelRPG.Handler.KeyboardHandler(Game, window),
@@ -85,6 +86,20 @@
             Game.$.Manager.Entity.register(new SquirrelRPG.Entity.Ninja(175, Canvas.get().height - 200));
             Game.$.Manager.Entity.register(new SquirrelRPG.Entity.Ninja(100, Canvas.get().height - 200));
             Game.$.Manager.Entity.register(new SquirrelRPG.Entity.Ninja(50, Canvas.get().height - 200));
+
+            Game.$.Manager.Collision.Handlers = [
+                {
+                    from: [ SquirrelRPG.Entity.Projectile ],
+                    to: [ SquirrelRPG.Entity.Creature ],
+                    handler: (from, to) => {
+                        let _this = Game.$.Manager.Entity;
+
+                        _this.register(new SquirrelRPG.Entity.Effect(SquirrelRPG.Enum.Effect.POOF, to.X, to.Y));
+                        _this.unregister(from);
+                        _this.unregister(to);
+                    } 
+                }
+            ];
 
 
             Canvas.loadImages([
