@@ -98,17 +98,8 @@ export default class EntityManager {
 
                 this.Game.Canvas.tile("skwrl-01", tileSize, tileCol * tileSize, tileRow * tileSize, ...ent.Model.getPos());
             } else {
-                if(ent.Model instanceof Circle) {
-                    let tileRow = 0,
-                        tileCol = 0;
-                
-                    if(ent.Direction === 1) {
-                        tileCol = 1;
-                    } else {
-                        tileCol = 0;
-                    }
-
-                    this.Game.Canvas.tile("skwrl-05", tileSize, tileCol * tileSize, tileRow * tileSize, ...ent.Model.getPos());
+                if(ent instanceof Entity.Projectile) {
+                    this.Game.Canvas.tile("akorn-01", tileSize, 0, 0, ...ent.Model.getPos());
                 }
             }
         });
