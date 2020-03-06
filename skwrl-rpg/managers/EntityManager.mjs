@@ -60,7 +60,7 @@ export default class EntityManager extends Manager {
                     ent.kill();
                 }
             }
-            
+
 
             //? Collision checks
             Entities.forEach(tar => {
@@ -87,6 +87,7 @@ export default class EntityManager extends Manager {
                 }
             }
 
+            //? Live or Die
             if(ent.shouldDie()) {
                 this.unregister(ent);
             } else {
