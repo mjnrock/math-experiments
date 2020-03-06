@@ -50,6 +50,19 @@ export default class EntityManager {
                 if(ent.X < 0 || ent.X > this.Game.Canvas.get().width || ent.Y < 0 || ent.Y > this.Game.Canvas.get().height) {
                     this.unregister(ent);
                 }
+
+                Object.values(this.Entities).forEach(tar => {
+                    if(ent !== tar && ent.Model.isCollision(tar.Model)) {
+                        if(tar instanceof Entity.Ninja) {
+                            this.register(new Entity.Effect(tar.X, tar.Y));
+                            this.unregister(tar);
+                        }
+                    }
+                });
+            } else if(ent instanceof Entity.Effect) {
+                if(ent.shouldDie()) {
+                    this.unregister(ent);
+                }
             }
 
             if(ent.Vx) {
@@ -100,7 +113,27 @@ export default class EntityManager {
             } else {
                 if(ent instanceof Entity.Projectile) {
                     this.Game.Canvas.tile("akorn-01", tileSize, 0, 0, ...ent.Model.getPos());
+                } else if(ent instanceof Entity.Ninja) {
+                    let tileRow = 0,
+                        tileCol = 0;
+                
+                    if(ent.Direction === 1) {
+                        tileCol = 1;
+                    } else {
+                        tileCol = 0;
+                    }
+
+                    this.Game.Canvas.tile("ninja-01", tileSize, tileCol * tileSize, tileRow * tileSize, ...ent.Model.getPos());
+                } else if(ent instanceof Entity.Effect) {
+                    this.Game.Canvas.tile("poof-01", tileSize, 0, 0, ...ent.Model.getPos());
                 }
+            }
+
+            if(this.Game.$.Handler.Keyboard.isDebugMode()) {
+                this.Game.Canvas.prop({
+                    strokeStyle: "#f00"
+                })
+                this.Game.Canvas.circle(ent.X, ent.Y, ent.Model.Radius);
             }
         });
     }

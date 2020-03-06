@@ -50,6 +50,12 @@ export default class KeyboardHandler extends DOMHandler {
                 JUMP: 2 << 7,
             }
         };
+
+        this._isDebugMode = false;
+    }
+
+    isDebugMode() {
+        return this._isDebugMode;
     }
 
     keyHasMap(name, key) {
@@ -83,7 +89,7 @@ export default class KeyboardHandler extends DOMHandler {
         return Bitwise.has(this.State.Mask, this.State.Flags.JUMP);
     }
 
-    updateDirectionMask(e) {
+    updateStateMask(e) {
         Object.keys(this.KeyMapping).forEach(key => {
             if(this.KeyMapping[ key ].includes(e.which)) {
                 if(e.type === "keyup") {
@@ -100,7 +106,7 @@ export default class KeyboardHandler extends DOMHandler {
     onKeyDown(e) {
         e.preventDefault();
 
-        this.updateDirectionMask(e);
+        this.updateStateMask(e);
 
         if(this.Game.$.Manager.Entity.MainPlayer.Vy === 0 && this.hasJump()) {
             this.Game.$.Manager.Entity.MainPlayer.Vy += this.Game.Physics.JUMP;
@@ -116,7 +122,11 @@ export default class KeyboardHandler extends DOMHandler {
     onKeyUp(e) {
         e.preventDefault();
 
-        this.updateDirectionMask(e);
+        if(e.which === 114) {
+            this._isDebugMode = !this._isDebugMode;
+        }
+
+        this.updateStateMask(e);
 
         if(this.Handlers.onKeyUp) {
             this.Handlers.onKeyUp.call(this, e);

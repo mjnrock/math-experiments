@@ -77,8 +77,9 @@
             });
 
             let skwrl = new SquirrelRPG.Entity.Squirrel(...Canvas.getCenterPoint(), `Mr. FuzzyBottoms`);
-
             Game.$.Manager.Entity.setMainPlayer(skwrl);
+
+            Game.$.Manager.Entity.register(new SquirrelRPG.Entity.Ninja(100, Canvas.get().height - 200));
 
 
             Canvas.loadImages([
@@ -89,6 +90,10 @@
                 [ "skwrl-05", "./assets/skwrl-05.png" ],
 
                 [ "akorn-01", "./assets/akorn-01.png" ],
+
+                [ "poof-01", "./assets/poof-01.png" ],
+
+                [ "ninja-01", "./assets/ninja-01.png" ],
             ]).then(data => {
                 Game.Play();
             });

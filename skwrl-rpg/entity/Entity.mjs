@@ -10,10 +10,12 @@ export default class Entity {
         this._Vx = 0;
         this._Vy = 0;
 
-        this.Model = model || new Circle(x, y, 50);
+        this.Model = model || new Circle(x, y, 32);
 
         this.Name = name;
         this.IsAPlayer = isPlayer;
+
+        this.IsCollidable = true;
     }
 
     //* Set traps to keep the Model's X,Y in sync with Entity
