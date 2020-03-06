@@ -87,7 +87,7 @@ export default class EntityManager extends Manager {
                 }
             }
 
-            //? Live or Die
+            //? Live or Die checks
             if(ent.shouldDie()) {
                 this.unregister(ent);
             } else {
