@@ -31,9 +31,11 @@ export default class KeyboardHandler extends DOMHandler {
             SHIFT: [ 16 ],
             ALT: [ 18 ],
             CTRL: [ 17 ],
+
+            JUMP: [ 32 ],
         };
 
-        this.Directions = {
+        this.State = {
             Mask: 0,
             Flags: {
                 UP: 2 << 0,
@@ -44,40 +46,50 @@ export default class KeyboardHandler extends DOMHandler {
                 SHIFT: 2 << 4,
                 ALT: 2 << 5,
                 CTRL: 2 << 6,
+
+                JUMP: 2 << 7,
             }
         };
     }
 
+    keyHasMap(name, key) {
+        return this.KeyMapping[ name ].includes(key);
+    }
+
     hasUp() {
-        return Bitwise.has(this.Directions.Mask, this.Directions.Flags.UP);
+        return Bitwise.has(this.State.Mask, this.State.Flags.UP);
     }
     hasDown() {
-        return Bitwise.has(this.Directions.Mask, this.Directions.Flags.DOWN);
+        return Bitwise.has(this.State.Mask, this.State.Flags.DOWN);
     }
     hasLeft() {
-        return Bitwise.has(this.Directions.Mask, this.Directions.Flags.LEFT);
+        return Bitwise.has(this.State.Mask, this.State.Flags.LEFT);
     }
     hasRight() {
-        return Bitwise.has(this.Directions.Mask, this.Directions.Flags.RIGHT);
+        return Bitwise.has(this.State.Mask, this.State.Flags.RIGHT);
     }
 
     hasShift() {
-        return Bitwise.has(this.Directions.Mask, this.Directions.Flags.SHIFT);
+        return Bitwise.has(this.State.Mask, this.State.Flags.SHIFT);
     }
     hasAlt() {
-        return Bitwise.has(this.Directions.Mask, this.Directions.Flags.ALT);
+        return Bitwise.has(this.State.Mask, this.State.Flags.ALT);
     }
     hasCtrl() {
-        return Bitwise.has(this.Directions.Mask, this.Directions.Flags.CTRL);
+        return Bitwise.has(this.State.Mask, this.State.Flags.CTRL);
+    }
+
+    hasJump() {
+        return Bitwise.has(this.State.Mask, this.State.Flags.JUMP);
     }
 
     updateDirectionMask(e) {
         Object.keys(this.KeyMapping).forEach(key => {
             if(this.KeyMapping[ key ].includes(e.which)) {
                 if(e.type === "keyup") {
-                    this.Directions.Mask = Bitwise.remove(this.Directions.Mask, this.Directions.Flags[ key ]);
+                    this.State.Mask = Bitwise.remove(this.State.Mask, this.State.Flags[ key ]);
                 } else if(e.type === "keydown") {
-                    this.Directions.Mask = Bitwise.add(this.Directions.Mask, this.Directions.Flags[ key ]);
+                    this.State.Mask = Bitwise.add(this.State.Mask, this.State.Flags[ key ]);
                 }
             }
         });
@@ -89,6 +101,11 @@ export default class KeyboardHandler extends DOMHandler {
         e.preventDefault();
 
         this.updateDirectionMask(e);
+
+        if(this.Game.$.Manager.Entity.MainPlayer.Vy === 0 && this.hasJump()) {
+            this.Game.$.Manager.Entity.MainPlayer.Vy += this.Game.Physics.JUMP;
+        }
+
         if(this.Handlers.onKeyDown) {
             this.Handlers.onKeyDown.call(this, e);
         }
@@ -100,6 +117,7 @@ export default class KeyboardHandler extends DOMHandler {
         e.preventDefault();
 
         this.updateDirectionMask(e);
+
         if(this.Handlers.onKeyUp) {
             this.Handlers.onKeyUp.call(this, e);
         }
@@ -117,11 +135,11 @@ export default class KeyboardHandler extends DOMHandler {
             this.Game.$.Manager.Entity.MainPlayer.X -= 10;
             this.Game.$.Manager.Entity.MainPlayer.Direction = -1;
         }
-        if(this.Game.$.Handler.Keyboard.hasDown()) {
-            this.Game.$.Manager.Entity.MainPlayer.Y += 10;
-        }
-        if(this.Game.$.Handler.Keyboard.hasUp()) {
-            this.Game.$.Manager.Entity.MainPlayer.Y -= 10;
-        }
+        // if(this.Game.$.Handler.Keyboard.hasDown()) {
+        //     this.Game.$.Manager.Entity.MainPlayer.Y += 10;
+        // }
+        // if(this.Game.$.Handler.Keyboard.hasUp()) {
+        //     this.Game.$.Manager.Entity.MainPlayer.Y -= 10;
+        // }
     }
 };

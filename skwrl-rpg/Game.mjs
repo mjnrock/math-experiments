@@ -3,6 +3,12 @@ export default class Game {
         this.IsRunning = false;
         this.Canvas = canvas;
 
+        this.Physics = {
+            PROJECTILE: 1000,
+            JUMP: -800,
+            GRAVITY: 2000
+        };
+
         this.Tick = {
             fn: tick,
             Interval: null,

@@ -1,5 +1,5 @@
 import Circle from "./../model/Circle.mjs";
-import Entity from "./../entity/Entity.mjs";
+import Entity from "./../entity/package.mjs";
 
 export default class EntityManager {
     constructor(game) {
@@ -20,7 +20,7 @@ export default class EntityManager {
     }
 
     register(entity) {
-        if(entity instanceof Entity) {
+        if(entity instanceof Entity.Entity) {
             this.Entities[ entity.UUID ] = entity;
 
             if(entity.IsAPlayer) {
@@ -31,7 +31,7 @@ export default class EntityManager {
         return this;
     }
     unregister(entity) {
-        if(entity instanceof Entity) {
+        if(entity instanceof Entity.Entity) {
             delete this.Entities[ entity.UUID ];
 
             if(entity.IsAPlayer) {
@@ -43,15 +43,44 @@ export default class EntityManager {
     }
 
     onTick(ts) {
-        Object.values(this.Entities).forEach(ent => ent.onTick(ts));
+        let testNudge = -200;
+
+        Object.values(this.Entities).forEach(ent => {
+            if(ent instanceof Entity.Projectile) {
+                if(ent.X < 0 || ent.X > this.Game.Canvas.get().width || ent.Y < 0 || ent.Y > this.Game.Canvas.get().height) {
+                    this.unregister(ent);
+                }
+            }
+
+            if(ent.Vx) {
+                ent.X += ent.Vx * ts;
+            }
+
+            if(ent.Y > this.Game.Canvas.get().height + testNudge - ent.Model.Radius / 2) {   // - 100 is testing nudge
+                ent.Vy = 0;
+
+                if(ent.Model instanceof Circle) {
+                    ent.Y = this.Game.Canvas.get().height + testNudge - ent.Model.Radius / 2;
+                }
+            } else {
+                ent.Y += ent.Vy * ts;
+
+                if(ent.Vy !== 0) {
+                    ent.Vy += ts * this.Game.Physics.GRAVITY;
+                }
+            }
+
+            ent.onTick(ts);
+        });
     }
 
     onRender(ts) {
         Object.values(this.Entities).forEach(ent => {
-            if(ent.Model instanceof Circle) {
+            let tileSize = 64;
+            
+            if(ent === this.Game.$.Manager.Entity.MainPlayer) {                
                 //? This state management here is just for testing
                 let state = this.Game.$.Handler.Mouse.hasLeft() ? "ATTACKING" : "NORMAL",
-                    tileSize = 64,
                     tileRow = 0,
                     tileCol = 0;
 
@@ -68,6 +97,19 @@ export default class EntityManager {
                 }
 
                 this.Game.Canvas.tile("skwrl-01", tileSize, tileCol * tileSize, tileRow * tileSize, ...ent.Model.getPos());
+            } else {
+                if(ent.Model instanceof Circle) {
+                    let tileRow = 0,
+                        tileCol = 0;
+                
+                    if(ent.Direction === 1) {
+                        tileCol = 1;
+                    } else {
+                        tileCol = 0;
+                    }
+
+                    this.Game.Canvas.tile("skwrl-05", tileSize, tileCol * tileSize, tileRow * tileSize, ...ent.Model.getPos());
+                }
             }
         });
     }

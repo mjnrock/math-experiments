@@ -1,6 +1,9 @@
 import Bitwise from "./../lib/Bitwise.mjs";
 import DOMHandler from "./DOMHandler.mjs";
 
+import Entity from "./../entity/package.mjs";
+import Model from "./../model/package.mjs";
+
 export default class MouseHandler extends DOMHandler {
     constructor(game, window, { move = null, down = null, up = null, click = null, dblclick = null, contextmenu = null } = {}) {
         super(game, window);
@@ -74,7 +77,20 @@ export default class MouseHandler extends DOMHandler {
     onMouseUp(e) {
         e.preventDefault();
 
+        if(this.hasRight()) {
+            let projectile = new Entity.Projectile(
+                this.Game.$.Manager.Entity.MainPlayer.X,
+                this.Game.$.Manager.Entity.MainPlayer.Y
+            );
+
+            projectile.Direction = this.Game.$.Manager.Entity.MainPlayer.Direction;
+            projectile.Vx = projectile.Direction * this.Game.Physics.PROJECTILE;
+
+            this.Game.$.Manager.Entity.register(projectile);
+        }
+
         this.updateStateMask(e);
+
         if(this.Handlers.onMouseUp) {
             this.Handlers.onMouseUp.call(this, e);
         }

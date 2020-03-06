@@ -7,6 +7,9 @@ export default class Entity {
         this._X = x;
         this._Y = y;
         this._Direction = -1;
+        this._Vx = 0;
+        this._Vy = 0;
+
         this.Model = model || new Circle(x, y, 50);
 
         this.Name = name;
@@ -22,6 +25,12 @@ export default class Entity {
         }
         get Direction() {
             return this._Direction;
+        }
+        get Vx() {
+            return this._Vx;
+        }
+        get Vy() {
+            return this._Vy;
         }
 
         set X(x) {
@@ -40,6 +49,16 @@ export default class Entity {
             this._Direction = dir;
 
             return this._Direction;
+        }
+        set Vx(vx) {
+            this._Vx = vx;
+
+            return this._Vx;
+        }
+        set Vy(vy) {
+            this._Vy = vy;
+
+            return this._Vy;
         }
 
     isCollision(shape) {
