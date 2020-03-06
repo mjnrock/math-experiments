@@ -1,14 +1,15 @@
 import { GenerateUUID } from "./../lib/Helpers.mjs";
 import Circle from "./../model/Circle.mjs";
+import Rectangle from "./../model/Rectangle.mjs";
 
 export default class Entity {
-    constructor(x, y, { name = `Entity`, type = null, model = null, isPlayer = false } = {}) {
+    constructor(x, y, { name = `Entity`, type = null, model = null, isPlayer = false, vx = 0, vy = 0, dir = -1 } = {}) {
         this.UUID = GenerateUUID();
         this._X = x;
         this._Y = y;
-        this._Direction = -1;
-        this._Vx = 0;
-        this._Vy = 0;
+        this._Direction = dir;
+        this._Vx = vx;
+        this._Vy = vy;
 
         this.Model = model || new Circle(x, y, 32);
 
@@ -63,6 +64,8 @@ export default class Entity {
 
             return this._Vy;
         }
+
+    
 
     isCollision(shape) {
         return this.Model.isCollision(shape);

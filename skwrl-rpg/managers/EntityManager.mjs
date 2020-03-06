@@ -1,5 +1,5 @@
-import Circle from "./../model/Circle.mjs";
 import Entity from "./../entity/package.mjs";
+import Model from "./../model/package.mjs";
 import Enum from "./../enum/package.mjs";
 
 export default class EntityManager {
@@ -56,7 +56,7 @@ export default class EntityManager {
 
                 for(let i = 0; i < Entities.length; i++) {
                     let tar = Entities[ i ];
-                    if(ent !== tar && tar.IsCollidable && ent.Model.isCollision(tar.Model)) {
+                    if(tar instanceof Entity.Creature && ent !== tar && tar.IsCollidable && ent.Model.isCollision(tar.Model)) {
                         this.register(new Entity.Effect(Enum.Effect.POOF, tar.X, tar.Y));
                         this.unregister(ent);
                         this.unregister(tar);
@@ -72,10 +72,10 @@ export default class EntityManager {
                 ent.X += ent.Vx * ts;
             }
 
-            if(ent.Y > this.Game.Canvas.get().height + testNudge - ent.Model.Radius / 2) {   // - 100 is testing nudge
+            if(ent.Vy > 0 && ent.Y > this.Game.Canvas.get().height + testNudge - ent.Model.Radius / 2) {   // - 100 is testing nudge
                 ent.Vy = 0;
 
-                if(ent.Model instanceof Circle) {
+                if(ent.Model instanceof Model.Circle) {
                     ent.Y = this.Game.Canvas.get().height + testNudge - ent.Model.Radius / 2;
                 }
             } else {
@@ -91,9 +91,12 @@ export default class EntityManager {
     }
 
     onRender(ts) {
-        Object.values(this.Entities).forEach(ent => {
-            let tileSize = 64;
-            
+        const tileSize = 64;
+        
+        // DEBUG
+        let playerHasCollision = false;
+
+        Object.values(this.Entities).forEach(ent => {            
             if(ent === this.Game.$.Manager.Entity.MainPlayer) {                
                 //? This state management here is just for testing
                 let state = this.Game.$.Handler.Mouse.hasLeft() ? "ATTACKING" : "NORMAL",
@@ -112,10 +115,16 @@ export default class EntityManager {
                     tileCol = 0;
                 }
 
-                this.Game.Canvas.tile("skwrl-01", tileSize, tileCol * tileSize, tileRow * tileSize, ...ent.Model.getPos());
+                this.Game.Canvas.tile("skwrl-01", tileSize, tileCol * tileSize, tileRow * tileSize, ...ent.Model.getPos({
+                    offX: -tileSize / 2,
+                    offY: -tileSize / 2,
+                }));
             } else {
                 if(ent instanceof Entity.Projectile) {
-                    this.Game.Canvas.tile("akorn-01", tileSize, 0, 0, ...ent.Model.getPos());
+                    this.Game.Canvas.tile("akorn-01", tileSize, 0, 0, ...ent.Model.getPos({
+                        offX: -tileSize / 2,
+                        offY: -tileSize / 2,
+                    }));
                 } else if(ent instanceof Entity.Ninja) {
                     let tileRow = 0,
                         tileCol = 0;
@@ -126,20 +135,62 @@ export default class EntityManager {
                         tileCol = 0;
                     }
 
-                    this.Game.Canvas.tile("ninja-01", tileSize, tileCol * tileSize, tileRow * tileSize, ...ent.Model.getPos());
+                    this.Game.Canvas.tile("ninja-01", tileSize, tileCol * tileSize, tileRow * tileSize, ...ent.Model.getPos({
+                        offX: -tileSize / 2,
+                        offY: -tileSize / 2,
+                    }));
                 } else if(ent instanceof Entity.Effect) {
                     let type = ent.Type === Enum.Effect.POOF ? "poof-01" : "";
 
-                    this.Game.Canvas.tile(type, tileSize, 0, 0, ...ent.Model.getPos());
+                    this.Game.Canvas.tile(type, tileSize, 0, 0, ...ent.Model.getPos({
+                        offX: -tileSize / 2,
+                        offY: -tileSize / 2,
+                    }));
                 }
             }
 
+            //! DEBUGGING ONLY
             if(this.Game.$.Handler.Keyboard.isDebugMode()) {
-                this.Game.Canvas.prop({
-                    strokeStyle: "#f00"
-                })
-                this.Game.Canvas.circle(ent.X, ent.Y, ent.Model.Radius);
+                const player = this.Game.$.Manager.Entity.MainPlayer;
+                
+                if(ent.IsCollidable && player.Model.isCollision(ent.Model)) {
+                    playerHasCollision = true;
+
+                    this.Game.Canvas.prop({
+                        strokeStyle: "#f00"
+                    });
+                } else {
+                    this.Game.Canvas.prop({
+                        strokeStyle: "#0f0"
+                    });
+                }
+
+                if(ent.Model instanceof Model.Circle) {
+                    this.Game.Canvas.circle(ent.X, ent.Y, ent.Model.Radius);
+                } else if(ent.Model instanceof Model.Rectangle) {
+                    this.Game.Canvas.rect(ent.X, ent.Y, ent.Model.Width, ent.Model.Height);
+                }
             }
         });
+        
+        //! DEBUGGING ONLY
+        if(this.Game.$.Handler.Keyboard.isDebugMode()) {
+            const player = this.Game.$.Manager.Entity.MainPlayer;
+            if(playerHasCollision) {
+                this.Game.Canvas.prop({
+                    strokeStyle: "#f00"
+                });
+            } else {
+                this.Game.Canvas.prop({
+                    strokeStyle: "#0f0"
+                });
+            }                  
+                
+            if(player.Model instanceof Model.Circle) {
+                this.Game.Canvas.circle(player.X, player.Y, player.Model.Radius);
+            } else if(player.Model instanceof Model.Rectangle) {
+                this.Game.Canvas.rect(player.X, player.Y, player.Model.Width, player.Model.Height);
+            }
+        }
     }
 }

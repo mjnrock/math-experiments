@@ -51,7 +51,7 @@ export default class KeyboardHandler extends DOMHandler {
             }
         };
 
-        this._isDebugMode = false;
+        this._isDebugMode = true;
     }
 
     isDebugMode() {
