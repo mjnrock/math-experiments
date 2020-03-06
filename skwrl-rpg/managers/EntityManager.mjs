@@ -43,22 +43,26 @@ export default class EntityManager {
     }
 
     onTick(ts) {
+        const Entities = Object.values(this.Entities);
+
         let testNudge = -200;
 
-        Object.values(this.Entities).forEach(ent => {
+        Entities.forEach(ent => {
             if(ent instanceof Entity.Projectile) {
                 if(ent.X < 0 || ent.X > this.Game.Canvas.get().width || ent.Y < 0 || ent.Y > this.Game.Canvas.get().height) {
                     this.unregister(ent);
                 }
 
-                Object.values(this.Entities).forEach(tar => {
+                for(let i = 0; i < Entities.length; i++) {
+                    let tar = Entities[ i ];
                     if(ent !== tar && ent.Model.isCollision(tar.Model)) {
                         if(tar instanceof Entity.Ninja) {
                             this.register(new Entity.Effect(tar.X, tar.Y));
+                            this.unregister(ent);
                             this.unregister(tar);
                         }
                     }
-                });
+                };
             } else if(ent instanceof Entity.Effect) {
                 if(ent.shouldDie()) {
                     this.unregister(ent);

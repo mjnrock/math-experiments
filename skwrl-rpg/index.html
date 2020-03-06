@@ -79,7 +79,11 @@
             let skwrl = new SquirrelRPG.Entity.Squirrel(...Canvas.getCenterPoint(), `Mr. FuzzyBottoms`);
             Game.$.Manager.Entity.setMainPlayer(skwrl);
 
+            Game.$.Manager.Entity.register(new SquirrelRPG.Entity.Ninja(300, Canvas.get().height - 200));
+            Game.$.Manager.Entity.register(new SquirrelRPG.Entity.Ninja(250, Canvas.get().height - 200));
+            Game.$.Manager.Entity.register(new SquirrelRPG.Entity.Ninja(175, Canvas.get().height - 200));
             Game.$.Manager.Entity.register(new SquirrelRPG.Entity.Ninja(100, Canvas.get().height - 200));
+            Game.$.Manager.Entity.register(new SquirrelRPG.Entity.Ninja(50, Canvas.get().height - 200));
 
 
             Canvas.loadImages([

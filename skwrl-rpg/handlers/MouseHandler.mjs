@@ -98,6 +98,16 @@ export default class MouseHandler extends DOMHandler {
         return this;
     }
 
+    onMouseMove(e) {
+        e.preventDefault();
+
+        if(this.Handlers.onMouseMove) {
+            this.Handlers.onMouseMove.call(this, e);
+        }
+    
+        return this;
+    }
+
     onContextMenu(e) {
         e.preventDefault();
 
