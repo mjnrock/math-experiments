@@ -14,8 +14,8 @@ export default class Entity {
 
         this.Type = type;
         this.Name = name;
-        this.IsAPlayer = isPlayer;
 
+        this.IsAPlayer = isPlayer;
         this.IsCollidable = true;
     }
 
@@ -72,6 +72,9 @@ export default class Entity {
 
     shouldDie() {
         return false;
+    }
+    kill() {
+        this.shouldDie = () => true;
     }
     
     onTick(ts) {}

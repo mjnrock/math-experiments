@@ -54,25 +54,26 @@ export default class EntityManager extends Manager {
         let testNudge = -200;
 
         Entities.forEach(ent => {
+            //? Lifecycle checks
             if(ent instanceof Entity.Projectile) {
                 if(ent.X < 0 || ent.X > this.Game.Canvas.get().width || ent.Y < 0 || ent.Y > this.Game.Canvas.get().height) {
-                    this.unregister(ent);
-                }
-            } else if(ent instanceof Entity.Effect) {
-                if(ent.shouldDie()) {
-                    this.unregister(ent);
+                    ent.kill();
                 }
             }
+            
 
+            //? Collision checks
             Entities.forEach(tar => {
                 this.Game.$.Manager.Collision.checkCollision(ent, tar);
             });
 
+
+            //? Physics checks
             if(ent.Vx) {
                 ent.X += ent.Vx * ts;
             }
 
-            if(ent.Vy > 0 && ent.Y > this.Game.Canvas.get().height + testNudge - ent.Model.Radius / 2) {   // - 100 is testing nudge
+            if(ent.Vy > 0 && ent.Y > this.Game.Canvas.get().height + testNudge - ent.Model.Radius / 2) {
                 ent.Vy = 0;
 
                 if(ent.Model instanceof Model.Circle) {
