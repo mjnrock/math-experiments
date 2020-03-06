@@ -1,5 +1,6 @@
 import Circle from "./../model/Circle.mjs";
 import Entity from "./../entity/package.mjs";
+import Enum from "./../enum/package.mjs";
 
 export default class EntityManager {
     constructor(game) {
@@ -56,7 +57,7 @@ export default class EntityManager {
                 for(let i = 0; i < Entities.length; i++) {
                     let tar = Entities[ i ];
                     if(ent !== tar && tar.IsCollidable && ent.Model.isCollision(tar.Model)) {
-                        this.register(new Entity.Effect(tar.X, tar.Y));
+                        this.register(new Entity.Effect(Enum.POOF, tar.X, tar.Y));
                         this.unregister(ent);
                         this.unregister(tar);
                     }
@@ -127,7 +128,9 @@ export default class EntityManager {
 
                     this.Game.Canvas.tile("ninja-01", tileSize, tileCol * tileSize, tileRow * tileSize, ...ent.Model.getPos());
                 } else if(ent instanceof Entity.Effect) {
-                    this.Game.Canvas.tile("poof-01", tileSize, 0, 0, ...ent.Model.getPos());
+                    let type = ent.Type === Enum.Effect.POOF ? "poof-01" : "";
+
+                    this.Game.Canvas.tile(type, tileSize, 0, 0, ...ent.Model.getPos());
                 }
             }
 

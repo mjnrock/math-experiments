@@ -1,9 +1,10 @@
 import Entity from "./Entity.mjs";
 
 export default class Effect extends Entity {
-    constructor(x, y, { name = `Effect`, lifespan = 500, isCollidable = false } = {}) {
+    constructor(type, x, y, { name = `Effect`, lifespan = 350, isCollidable = false } = {}) {
         super(x, y, { name });
 
+        this.Type = type;
         this.Birth = Date.now();
         this.Lifespan = lifespan;
         this.IsCollidable = isCollidable;
