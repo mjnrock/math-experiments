@@ -139,11 +139,11 @@ export default class KeyboardHandler extends DOMHandler {
         //* Move the Main Player if there is Keyboard input
         if(this.Game.$.Handler.Keyboard.hasRight()) {
             this.Game.$.Manager.Entity.MainPlayer.X += 10;
-            this.Game.$.Manager.Entity.MainPlayer.Direction = 1;
+            // this.Game.$.Manager.Entity.MainPlayer.Direction = 1;
         }
         if(this.Game.$.Handler.Keyboard.hasLeft()) {
             this.Game.$.Manager.Entity.MainPlayer.X -= 10;
-            this.Game.$.Manager.Entity.MainPlayer.Direction = -1;
+            // this.Game.$.Manager.Entity.MainPlayer.Direction = -1;
         }
         // if(this.Game.$.Handler.Keyboard.hasDown()) {
         //     this.Game.$.Manager.Entity.MainPlayer.Y += 10;

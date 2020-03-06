@@ -10,7 +10,7 @@ export default class MouseHandler extends DOMHandler {
 
         window.onmousedown = this.onMouseDown.bind(this);
         window.onmouseup = this.onMouseUp.bind(this);
-        // window.onmousemove = this.onMouseMove.bind(this);
+        window.onmousemove = this.onMouseMove.bind(this);
         // window.onclick = this.onClick.bind(this);
         // window.ondblclick = this.onDblClick.bind(this);
         window.oncontextmenu = this.onContextMenu.bind(this);
@@ -64,6 +64,13 @@ export default class MouseHandler extends DOMHandler {
         return this;
     }
 
+    getMousePosition(e) {
+        return [
+            e.x - this.Game.Canvas.canvas.offsetLeft,
+            e.y - this.Game.Canvas.canvas.offsetTop
+        ];
+    }
+
     onMouseDown(e) {
         e.preventDefault();
 
@@ -100,6 +107,14 @@ export default class MouseHandler extends DOMHandler {
 
     onMouseMove(e) {
         e.preventDefault();
+
+        let [ mx, my ] = this.getMousePosition(e);
+
+        if(mx > this.Game.$.Manager.Entity.MainPlayer.X) {
+            this.Game.$.Manager.Entity.MainPlayer.Direction = 1;
+        } else {
+            this.Game.$.Manager.Entity.MainPlayer.Direction = -1;
+        }
 
         if(this.Handlers.onMouseMove) {
             this.Handlers.onMouseMove.call(this, e);
