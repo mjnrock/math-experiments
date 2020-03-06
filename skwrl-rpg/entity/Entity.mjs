@@ -1,6 +1,5 @@
 import { GenerateUUID } from "./../lib/Helpers.mjs";
 import Circle from "./../model/Circle.mjs";
-import Rectangle from "./../model/Rectangle.mjs";
 
 export default class Entity {
     constructor(x, y, { name = `Entity`, type = null, model = null, isPlayer = false, vx = 0, vy = 0, dir = -1 } = {}) {

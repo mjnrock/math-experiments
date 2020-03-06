@@ -86,6 +86,7 @@ export default class MouseHandler extends DOMHandler {
 
         if(this.hasRight()) {
             let projectile = new Entity.Projectile(
+                this.Game.$.Manager.Entity.MainPlayer,
                 this.Game.$.Manager.Entity.MainPlayer.X + (this.Game.$.Manager.Entity.MainPlayer.Direction === -1 ? -65 : 65),
                 this.Game.$.Manager.Entity.MainPlayer.Y
             );
