@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tachyons/4.11.1/tachyons.min.css" integrity="sha256-XiJ+PedljEmPP2VaQzSzekfCZdPr0fpqmh9dY6kpsuQ=" crossorigin="anonymous" />
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/6.6.1/math.min.js" integrity="sha256-GRICDUAZi4ixXD2USKabeCWS1tT0noAuMFauMmXEmHs=" crossorigin="anonymous"></script>
+
+        <title>Vector Field</title>
+    </head>
+    <body>
+        <div>
+            <canvas id="main" class="ba br2 ml4 mt4" width="500" height="500"></canvas>
+        </div>
+    
+        <pre id="code" class="ma4"></pre>
+
+        <script type="module">
+            import Lib from "./../lib/package.mjs";
+
+            const Canvas = new Lib.Canvas(document.getElementById("main"));
+
+            let Field = {
+                VelocityFactor: 10,
+                Vector: {},
+                Particle: []
+            };
+            for(let x = 0; x <= Canvas.get().width; x++) {
+                for(let y = 0; y <= Canvas.get().height; y++) {
+                    Field.Vector[ `${ x },${ y }` ] = [
+                        1,
+                        0
+                    ];
+                }
+            }
+
+            for(let i = 0; i < 10000; i++) {
+                Field.Particle.push([
+                    Math.random() * 500,
+                    Math.random() * 500,
+                ]);
+            }
+
+            // let tickFPS = 30;
+            // let tickInterval = null;
+            // let lastTickTime = Date.now();
+            // function Tick(ts) {
+            //     let delta = (ts - lastTickTime) / 1000;
+
+            //     Field.Particle = Field.Particle.map((p, i) => {
+            //         let [ px, py ] = p;
+
+            //         if(Field.Vector[ `${ ~~px },${ ~~py }` ]) {
+            //             let [ vx, vy ] = Field.Vector[ `${ ~~px },${ ~~py }` ];
+
+            //             let mvx = vx;
+            //             let mvy = vy;
+
+            //             return [
+            //                 px + (mvx * Field.VelocityFactor * delta),
+            //                 py + (mvy * Field.VelocityFactor * delta),
+            //             ];
+            //         }
+
+            //         return p;
+            //     });
+
+            //     lastTickTime = ts;
+            // }
+
+            Canvas.prop({
+                strokeStyle: "#000"
+            });
+            let lastDrawTime = 0;
+            function Draw(ts) {
+                let delta = (ts - lastDrawTime) / 1000;
+
+                Field.Particle = Field.Particle.map((p, i) => {
+                    let [ px, py ] = p;
+
+                    if(Field.Vector[ `${ ~~px },${ ~~py }` ]) {
+                        let [ vx, vy ] = Field.Vector[ `${ ~~px },${ ~~py }` ];
+
+                        let mvx = vx;
+                        let mvy = vy;
+
+                        return [
+                            px + (mvx * Field.VelocityFactor * delta),
+                            py + (mvy * Field.VelocityFactor * delta),
+                        ];
+                    }
+
+                    return p;
+                });
+
+                Canvas.clear();
+                Field.Particle.forEach(([ x, y ], i) => {
+                    Canvas.point(x, y);
+                })
+
+                lastDrawTime = ts;
+                requestAnimationFrame(Draw);
+            }
+
+            // tickInterval = setInterval(() => Tick(Date.now()), 1000 / tickFPS);
+            requestAnimationFrame(Draw);
+        </script>
+    </body>
+</html>
