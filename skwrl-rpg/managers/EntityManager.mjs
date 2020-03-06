@@ -69,6 +69,7 @@ export default class EntityManager extends Manager {
 
 
             //? Physics checks
+            //TODO Send to PhysicsManager
             if(ent.Vx) {
                 ent.X += ent.Vx * ts;
             }
@@ -86,6 +87,7 @@ export default class EntityManager extends Manager {
                     ent.Vy += ts * this.Game.$.Manager.Physics.Constants.GRAVITY;
                 }
             }
+
 
             //? Live or Die checks
             if(ent.shouldDie()) {
