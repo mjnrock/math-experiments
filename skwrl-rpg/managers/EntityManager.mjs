@@ -57,7 +57,7 @@ export default class EntityManager {
                 for(let i = 0; i < Entities.length; i++) {
                     let tar = Entities[ i ];
                     if(ent !== tar && tar.IsCollidable && ent.Model.isCollision(tar.Model)) {
-                        this.register(new Entity.Effect(Enum.POOF, tar.X, tar.Y));
+                        this.register(new Entity.Effect(Enum.Effect.POOF, tar.X, tar.Y));
                         this.unregister(ent);
                         this.unregister(tar);
                     }

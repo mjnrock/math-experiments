@@ -2,7 +2,7 @@ import { GenerateUUID } from "./../lib/Helpers.mjs";
 import Circle from "./../model/Circle.mjs";
 
 export default class Entity {
-    constructor(x, y, { name = `Entity`, model = null, isPlayer = false } = {}) {
+    constructor(x, y, { name = `Entity`, type = null, model = null, isPlayer = false } = {}) {
         this.UUID = GenerateUUID();
         this._X = x;
         this._Y = y;
@@ -12,6 +12,7 @@ export default class Entity {
 
         this.Model = model || new Circle(x, y, 32);
 
+        this.Type = type;
         this.Name = name;
         this.IsAPlayer = isPlayer;
 
