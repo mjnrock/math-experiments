@@ -1,4 +1,5 @@
 import Shape from "./Shape.mjs";
+import Circle from "./Circle.mjs";
 
 export default class Rectangle extends Shape {
     constructor(x, y, w, h) {
@@ -75,6 +76,8 @@ export default class Rectangle extends Shape {
 
             return (Math.abs(t.xc - s.xc) <= (this.Width / 2 + shape.Width / 2))
                 && (Math.abs(t.yc - s.yc) <= (this.Height / 2 + shape.Height / 2));
+        } else if(shape instanceof Circle) {
+            
         }
 
         return false;

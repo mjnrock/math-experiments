@@ -1,4 +1,5 @@
 import Shape from "./Shape.mjs";
+import Rectangle from "./Rectangle.mjs";
 
 export default class Circle extends Shape {
     constructor(x, y, r) {
@@ -59,6 +60,8 @@ export default class Circle extends Shape {
         
         if(shape instanceof Circle) {
             return Math.sqrt(Math.pow(shape.X - this.X, 2) + Math.pow(shape.Y - this.Y, 2)) <= this.Radius + shape.Radius;
+        } else if(shape instanceof Rectangle) {
+
         }
 
         return false;
