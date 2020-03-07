@@ -3,4 +3,7 @@ export default class Shape {
         this.X = x;
         this.Y = y;
     }
+
+    getRelativeWidth() {}
+    getRelativeHeight() {}
 }

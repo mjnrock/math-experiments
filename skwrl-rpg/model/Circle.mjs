@@ -7,6 +7,13 @@ export default class Circle extends Shape {
         this.Radius = r;
     }
 
+    getRelativeWidth() {
+        return this.Radius;
+    }
+    getRelativeHeight() {
+        return this.Radius;
+    }
+
     getPos({ asObj = false, offX = 0, offY = 0 } = {}) {
         let x = this.X + offX,
             y = this.Y + offY;

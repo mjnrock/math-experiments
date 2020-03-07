@@ -19,7 +19,9 @@ export default class PhysicsManager extends Manager {
     }
 
     applyGravity(dt, entity) {
-        entity.Vy += this.Constants.GRAVITY * dt;
+        if(entity.HasGravity) {
+            entity.Vy += this.Constants.GRAVITY * dt;
+        }
     }
 
     onTick(ts) {}

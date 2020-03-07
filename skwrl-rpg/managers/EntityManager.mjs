@@ -61,34 +61,33 @@ export default class EntityManager extends Manager {
                 }
             }
 
+            //? Physics checks
+            //TODO Send to PhysicsManager
+            // if(ent.Vx) {
+            //     ent.X += ent.Vx * dt;
+            // }
+
+            // if(ent.Vy > 0 && ent.Y > this.Game.Canvas.get().height + testNudge - ent.Model.Radius / 2) {
+            //     ent.Vy = 0;
+
+            //     if(ent.Model instanceof Model.Circle) {
+            //         ent.Y = this.Game.Canvas.get().height + testNudge - ent.Model.Radius / 2;
+            //     }
+            // } else {
+            //     ent.Y += ent.Vy * dt;
+
+            //     if(ent.Vy !== 0) {
+            //         ent.Vy += dt * this.Game.$.Manager.Physics.Constants.GRAVITY;
+            //     }
+            // }
+            this.Game.$.Manager.Physics.applyGravity(dt, ent);
+            this.Game.$.Manager.Physics.updatePosition(dt, ent);
+
 
             //? Collision checks
             Entities.forEach(tar => {
                 this.Game.$.Manager.Collision.checkCollision(ent, tar);
             });
-
-
-            //? Physics checks
-            //TODO Send to PhysicsManager
-            if(ent.Vx) {
-                ent.X += ent.Vx * dt;
-            }
-
-            if(ent.Vy > 0 && ent.Y > this.Game.Canvas.get().height + testNudge - ent.Model.Radius / 2) {
-                ent.Vy = 0;
-
-                if(ent.Model instanceof Model.Circle) {
-                    ent.Y = this.Game.Canvas.get().height + testNudge - ent.Model.Radius / 2;
-                }
-            } else {
-                ent.Y += ent.Vy * dt;
-
-                if(ent.Vy !== 0) {
-                    ent.Vy += dt * this.Game.$.Manager.Physics.Constants.GRAVITY;
-                }
-            }
-            this.Game.$.Manager.Physics.applyGravity(dt, ent);
-            this.Game.$.Manager.Physics.updatePosition(dt, ent);
 
 
             //? Live or Die checks
@@ -156,6 +155,11 @@ export default class EntityManager extends Manager {
                         offX: -tileSize / 2,
                         offY: -tileSize / 2,
                     }));
+                } else if(ent instanceof Entity.Terrain) {
+                    this.Game.Canvas.prop({
+                        strokeStyle: "#000"
+                    });
+                    this.Game.Canvas.rect(ent.X, ent.Y, ent.Model.getRelativeWidth(false), ent.Model.getRelativeHeight(false));
                 }
             }
 

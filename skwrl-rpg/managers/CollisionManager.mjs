@@ -1,5 +1,8 @@
 import Manager from "./Manager.mjs";
 
+
+import Terrain from "./../entity/Terrain.mjs";
+
 export default class CollisionManager extends Manager {
     constructor(game, window) {
         super(game, window);

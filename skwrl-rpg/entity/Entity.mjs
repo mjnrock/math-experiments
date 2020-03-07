@@ -18,6 +18,7 @@ export default class Entity {
 
         this.IsAPlayer = isPlayer;
         this.IsCollidable = true;
+        this.HasGravity = true;
 
         this.State = 0;
     }

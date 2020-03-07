@@ -8,6 +8,21 @@ export default class Rectangle extends Shape {
         this.Height = h;
     }
 
+    getRelativeWidth(originToLeft = true) {
+        if(originToLeft) {
+            return 0;
+        }
+
+        return this.Width;
+    }
+    getRelativeHeight(originToTop = true) {
+        if(originToTop) {
+            return 0;
+        }
+
+        return this.Height;
+    }
+
     getPos({ asObj = false, offX = 0, offY = 0 } = {}) {
         let x = this.X + offX,
             y = this.Y + offY;
