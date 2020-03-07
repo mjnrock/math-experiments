@@ -79,6 +79,7 @@
             });
 
             let skwrl = new SquirrelRPG.Entity.Squirrel(...Canvas.getCenterPoint(), `Mr. FuzzyBottoms`);
+            //TODO Square box works with Terrain, Cricle does with bugs ("jump up" problem, non-active collision with Terrain)
             skwrl.Model = new SquirrelRPG.Model.Rectangle(skwrl.X, skwrl.Y, 32, 32);
             Game.$.Manager.Entity.setMainPlayer(skwrl);
 
