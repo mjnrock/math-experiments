@@ -6,12 +6,27 @@ export default class Circle extends Shape {
 
         this.Radius = r;
     }
+    
+    getAABB(asObj = false) {
+        if(asObj) {
+            return {                
+                x0: this.X - this.Radius,
+                y0: this.Y - this.Radius,
+                x1: this.X + this.Radius,
+                x1: this.Y + this.Radius,
+                w: this.Radius * 2,
+                h: this.Radius * 2
+            };
+        }
 
-    getRelativeWidth() {
-        return this.Radius;
-    }
-    getRelativeHeight() {
-        return this.Radius;
+        return [
+            this.X - this.Radius,
+            this.Y - this.Radius,
+            this.X + this.Radius,
+            this.Y + this.Radius,
+            this.Radius * 2,
+            this.Radius * 2
+        ];
     }
 
     getPos({ asObj = false, offX = 0, offY = 0 } = {}) {
@@ -21,18 +36,20 @@ export default class Circle extends Shape {
         if(asObj) {
             return {
                 x: x,
-                y: y
+                y: y,
+                r: this.Radius
             };
         }
 
         return [
             x,
-            y
+            y,
+            this.Radius
         ];
     }
 
     isPointInside(x, y) {
-        return Math.sqrt(Math.pow(c - this.X, 2) + Math.pow(y - this.Y, 2)) <= this.Radius;
+        return Math.sqrt(Math.pow(x - this.X, 2) + Math.pow(y - this.Y, 2)) <= this.Radius;
     }
 
     isCollision(shape) {

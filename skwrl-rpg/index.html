@@ -118,8 +118,11 @@
                 (from, to) => {
                     from.Vy = 0;
 
-                    if(from.Y + from.Model.getRelativeHeight(false) > to.Y) {
-                        from.Y = to.Y - to.Model.getRelativeHeight() - from.Model.getRelativeHeight(false);
+                    let { x0: fx, y0: fy, w: fw, h: fh } = from.Model.getAABB(true),
+                        { x0: tx, y0: ty, w: tw, h: th } = to.Model.getAABB(true);
+
+                    if(fy + fh > ty) {
+                        from.Y = ty - fh;
                     }
                 }
             );

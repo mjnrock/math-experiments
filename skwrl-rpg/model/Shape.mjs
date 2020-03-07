@@ -4,6 +4,5 @@ export default class Shape {
         this.Y = y;
     }
 
-    getRelativeWidth() {}
-    getRelativeHeight() {}
+    getAABB() {}
 }

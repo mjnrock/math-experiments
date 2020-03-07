@@ -51,8 +51,6 @@ export default class EntityManager extends Manager {
     onTick(dt) {
         const Entities = Object.values(this.Entities);
 
-        let testNudge = -200;
-
         Entities.forEach(ent => {
             //? Lifecycle checks
             if(ent instanceof Entity.Projectile) {
@@ -62,24 +60,6 @@ export default class EntityManager extends Manager {
             }
 
             //? Physics checks
-            //TODO Send to PhysicsManager
-            // if(ent.Vx) {
-            //     ent.X += ent.Vx * dt;
-            // }
-
-            // if(ent.Vy > 0 && ent.Y > this.Game.Canvas.get().height + testNudge - ent.Model.Radius / 2) {
-            //     ent.Vy = 0;
-
-            //     if(ent.Model instanceof Model.Circle) {
-            //         ent.Y = this.Game.Canvas.get().height + testNudge - ent.Model.Radius / 2;
-            //     }
-            // } else {
-            //     ent.Y += ent.Vy * dt;
-
-            //     if(ent.Vy !== 0) {
-            //         ent.Vy += dt * this.Game.$.Manager.Physics.Constants.GRAVITY;
-            //     }
-            // }
             this.Game.$.Manager.Physics.applyGravity(dt, ent);
             this.Game.$.Manager.Physics.updatePosition(dt, ent);
 
@@ -159,7 +139,8 @@ export default class EntityManager extends Manager {
                     this.Game.Canvas.prop({
                         strokeStyle: "#000"
                     });
-                    this.Game.Canvas.rect(ent.X, ent.Y, ent.Model.getRelativeWidth(false), ent.Model.getRelativeHeight(false));
+                    let { w, h } = ent.Model.getAABB(true);
+                    this.Game.Canvas.rect(ent.X, ent.Y, w, h);
                 }
             }
 
