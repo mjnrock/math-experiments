@@ -7,6 +7,7 @@ export default class Effect extends Entity {
         this.Birth = Date.now();
         this.Lifespan = lifespan;
         this.IsCollidable = isCollidable;
+        this.HasGravity = false;
     }
 
     shouldDie() {

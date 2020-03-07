@@ -58,10 +58,21 @@ export default class Circle extends Shape {
             return false;
         }
         
+        let d = Math.sqrt(Math.pow(shape.X - this.X, 2) + Math.pow(shape.Y - this.Y, 2));
         if(shape instanceof Circle) {
-            return Math.sqrt(Math.pow(shape.X - this.X, 2) + Math.pow(shape.Y - this.Y, 2)) <= this.Radius + shape.Radius;
+            return d <= this.Radius + shape.Radius;
         } else if(shape instanceof Rectangle) {
+            let clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 
+            let xn = clamp(this.X, shape.X, shape.X + shape.Width);
+            let yn = clamp(this.Y, shape.Y, shape.Y + shape.Height);
+
+            let dx = this.X - xn;
+            let dy = this.Y - yn;
+
+            let d2 = (dx * dx) + (dy * dy);
+            
+            return d2 < (this.Radius * this.Radius);
         }
 
         return false;
