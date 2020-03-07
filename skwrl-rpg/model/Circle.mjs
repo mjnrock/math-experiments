@@ -14,7 +14,7 @@ export default class Circle extends Shape {
                 x0: this.X - this.Radius,
                 y0: this.Y - this.Radius,
                 x1: this.X + this.Radius,
-                x1: this.Y + this.Radius,
+                y1: this.Y + this.Radius,
                 w: this.Radius * 2,
                 h: this.Radius * 2
             };

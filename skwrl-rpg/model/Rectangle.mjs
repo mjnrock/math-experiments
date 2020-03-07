@@ -15,7 +15,7 @@ export default class Rectangle extends Shape {
                 x0: this.X,
                 y0: this.Y,
                 x1: this.X + this.Width,
-                x1: this.Y + this.Height,
+                y1: this.Y + this.Height,
                 w: this.Width,
                 h: this.Height
             };

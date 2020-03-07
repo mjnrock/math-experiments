@@ -92,10 +92,14 @@
             terr1.Model.Width = 800;
             terr1.Model.Height = 10;
             Game.$.Manager.Entity.register(terr1);
-            let terr2 = new SquirrelRPG.Entity.Terrain(500, Canvas.get().height - 400);
+            let terr2 = new SquirrelRPG.Entity.Terrain(500, Canvas.get().height - 480);
             terr2.Model.Width = 200;
             terr2.Model.Height = 10;
             Game.$.Manager.Entity.register(terr2);
+            let terr3 = new SquirrelRPG.Entity.Terrain(300, Canvas.get().height - 200);
+            terr3.Model.Width = 800;
+            terr3.Model.Height = 10;
+            Game.$.Manager.Entity.register(terr3);
 
             Game.$.Manager.Collision.add([
                     SquirrelRPG.Entity.Projectile
@@ -116,14 +120,18 @@
                     SquirrelRPG.Entity.Terrain
                 ],
                 (from, to) => {
-                    from.Vy = 0;
+                    let f = from.Model.getAABB(true),
+                        t = to.Model.getAABB(true);
 
-                    let { x0: fx, y0: fy, w: fw, h: fh } = from.Model.getAABB(true),
-                        { x0: tx, y0: ty, w: tw, h: th } = to.Model.getAABB(true);
-
-                    //TODO This currently does not take into account the "direction" of travel (e.g. touching from any direction puts entity on top)
-                    if(fy + fh > ty) {
-                        from.Y = ty - fh;
+                    // "Falling" Collision (i.e Bottom-to-Top)
+                    if(from.Vy > 0) {
+                        from.Y = t.y0 - f.h;
+                        from.Vy = 0;
+                    } 
+                    // "Jumping" Collision (i.e Top-to-Bottom)
+                    if(from.Vy < 0) {
+                        from.Y = t.y1;
+                        from.Vy = -1;
                     }
                 }
             );
