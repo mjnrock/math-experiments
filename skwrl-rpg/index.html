@@ -121,6 +121,7 @@
                     let { x0: fx, y0: fy, w: fw, h: fh } = from.Model.getAABB(true),
                         { x0: tx, y0: ty, w: tw, h: th } = to.Model.getAABB(true);
 
+                    //TODO This currently does not take into account the "direction" of travel (e.g. touching from any direction puts entity on top)
                     if(fy + fh > ty) {
                         from.Y = ty - fh;
                     }

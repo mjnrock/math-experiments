@@ -6,7 +6,7 @@ export default class Game {
         this.Tick = {
             fn: tick,
             Interval: null,
-            FPS: 24,
+            FPS: 30,
             LastTimestamp: Date.now()
         };
         this.Render = {
