@@ -125,7 +125,7 @@
                         t = to.Model.getAABB(true);
 
                     // "Falling" Collision (i.e Bottom-to-Top)
-                    if(from.Vy > 0 && f.y1 >= t.y0 && f.y0 < t.y0) {
+                    if(from.Vy > 0 && f.y1 >= t.y0 && f.y0 < t.y0) {  // 10 is a +/- error margin (Entities would occassionally fall through world)
                         if(from.Model instanceof SquirrelRPG.Model.Rectangle) {
                             from.Y = t.y0 - f.h;
                         } else if(from.Model instanceof SquirrelRPG.Model.Circle) {

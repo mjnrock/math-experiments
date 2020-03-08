@@ -104,7 +104,7 @@ export default class EntityManager extends Manager {
                     tileCol = 0;
                 }
 
-                this.Game.Canvas.tile("skwrl-01", tileSize, tileCol * tileSize, tileRow * tileSize, ...ent.Model.getPos({
+                this.Game.Canvas.tile("skwrl-05", tileSize, tileCol * tileSize, tileRow * tileSize, ...ent.Model.getPos({
                     offX: -tileSize / 2,
                     offY: -tileSize / 2,
                 }));
@@ -137,10 +137,11 @@ export default class EntityManager extends Manager {
                     }));
                 } else if(ent instanceof Entity.Terrain) {
                     this.Game.Canvas.prop({
-                        strokeStyle: "#000"
+                        strokeStyle: "#000",
+                        fillStyle: "#333",
                     });
                     let { w, h } = ent.Model.getAABB(true);
-                    this.Game.Canvas.rect(ent.X, ent.Y, w, h);
+                    this.Game.Canvas.rect(ent.X, ent.Y, w, h, { isFilled: true });
                 }
             }
 
