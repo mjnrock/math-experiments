@@ -109,7 +109,7 @@ export default class KeyboardHandler extends DOMHandler {
         this.updateStateMask(e);
 
         if(this.Game.$.Manager.Entity.MainPlayer.Vy === 0 && this.hasJump()) {
-            this.Game.$.Manager.Entity.MainPlayer.Vy += this.Game.$.Manager.Physics.Constants.JUMP;
+            this.Game.$.Manager.Entity.MainPlayer.Vy = this.Game.$.Manager.Physics.Constants.JUMP;
         }
 
         if(this.Handlers.onKeyDown) {
@@ -122,8 +122,10 @@ export default class KeyboardHandler extends DOMHandler {
     onKeyUp(e) {
         e.preventDefault();
 
-        if(e.which === 114) {
+        if(e.which === 114) {   // F3
             this._isDebugMode = !this._isDebugMode;
+        } else if(e.which === 116) {    // F5
+            window.location.reload(false);
         }
 
         this.updateStateMask(e);

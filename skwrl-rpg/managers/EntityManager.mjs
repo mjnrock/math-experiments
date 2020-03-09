@@ -63,8 +63,8 @@ export default class EntityManager extends Manager {
                 }
 
                 //? Physics checks
-                this.Game.$.Manager.Physics.applyGravity(dt, ent);
-                this.Game.$.Manager.Physics.updatePosition(dt, ent);
+                this.Game.$.Manager.Physics.applyGravity(ent);
+                this.Game.$.Manager.Physics.updatePosition(ent, dt);
 
 
                 //? Collision checks

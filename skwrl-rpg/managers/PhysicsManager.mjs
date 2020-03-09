@@ -9,19 +9,19 @@ export default class PhysicsManager extends Manager {
         
         this.Constants = {
             PROJECTILE: 1000,
-            JUMP: -800,
+            JUMP: -500,
             GRAVITY: 16
         };
     }
 
-    updatePosition(dt, entity) {
+    updatePosition(entity, dt) {
         entity.X += entity.Vx * dt;
         entity.Y += entity.Vy * dt;
 
         return this;
     }
 
-    applyGravity(dt, entity) {
+    applyGravity(entity) {
         if(entity.HasGravity) {
             entity.Vy += this.Constants.GRAVITY;
         }
@@ -38,20 +38,10 @@ export default class PhysicsManager extends Manager {
         if(from.Model.Mass === Infinity) {
             dxt = 0;
             dyt = 0;
-
-            to.Vx = -to.Vx;
-            to.Vy = -to.Vy;
-
-            this.updatePosition(this.Game.Tick.LastDelta, to);
         }
         if(to.Model.Mass === Infinity) {
             dxf = 0;
             dyf = 0;
-            
-            from.Vx = -from.Vx;
-            from.Vy = -from.Vy;
-
-            this.updatePosition(this.Game.Tick.LastDelta, from);
         }
 
         // console.log("=========== START ==========");
@@ -136,7 +126,7 @@ export default class PhysicsManager extends Manager {
         let f = from.Model.getAABB(true),
             t = to.Model.getAABB(true);
             
-        if(Bitwise.has(direction, Enum.Direction.NORTH)) {
+        if(Bitwise.has(direction.major, Enum.Direction.NORTH)) {
             if(from.Model instanceof Model.Rectangle) {
                 from.Y = t.y1;
             } else if(from.Model instanceof Model.Circle) {
@@ -144,7 +134,7 @@ export default class PhysicsManager extends Manager {
             }
             from.Vy = -1;
         }
-        if(Bitwise.has(direction, Enum.Direction.SOUTH)) {
+        if(Bitwise.has(direction.major, Enum.Direction.SOUTH)) {
             if(from.Model instanceof Model.Rectangle) {
                 from.Y = t.y0 - f.h;
             } else if(from.Model instanceof Model.Circle) {
@@ -152,24 +142,26 @@ export default class PhysicsManager extends Manager {
             }
             from.Vy = 0;
         }
-        if(Bitwise.has(direction, Enum.Direction.EAST)) {
+        // if(Bitwise.has(direction.major, Enum.Direction.EAST)) {
+        if(direction.degrees <= 44 || direction.degrees >= 316) {
             let xn;
             if(from.Model instanceof Model.Rectangle) {
                 xn = t.x0 - f.w;
             } else if(from.Model instanceof Model.Circle) {
                 xn = t.x0 - from.Model.Radius;
             }
-            from.X = Math.min(from.X, xn);
+            from.X = Math.min(from.X - 1, xn);
             from.Vx = 0;
         }
-        if(Bitwise.has(direction, Enum.Direction.WEST)) {
+        // if(Bitwise.has(direction.major, Enum.Direction.WEST)) {
+        if(direction.degrees >= 136 && direction.degrees <= 224) {
             let xn;
             if(from.Model instanceof Model.Rectangle) {
                 xn = t.x1;
             } else if(from.Model instanceof Model.Circle) {
                 xn = t.x1 + from.Model.Radius;
             }
-            from.X = Math.max(from.X, xn);
+            from.X = Math.max(from.X + 1, xn);
             from.Vx = 0;
         }
     }
