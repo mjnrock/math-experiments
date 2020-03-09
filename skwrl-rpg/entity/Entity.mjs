@@ -20,7 +20,6 @@ export default class Entity {
         this.IsCollidable = true;
         this.HasGravity = true;
 
-        this.IsFlying = true;
         this.State = 0;
     }
 
