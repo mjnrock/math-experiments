@@ -8,6 +8,8 @@ export default class Terrain extends Entity {
             ...opts
         });
 
+        this.Model.Mass = Infinity;
+
         this.HasGravity = false;
     }
 };

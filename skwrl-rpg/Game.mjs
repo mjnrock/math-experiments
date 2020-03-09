@@ -6,8 +6,9 @@ export default class Game {
         this.Tick = {
             fn: tick,
             Interval: null,
-            FPS: 24,
-            LastTimestamp: Date.now()
+            FPS: 60,
+            LastTimestamp: Date.now(),
+            LastDelta: 0
         };
         this.Render = {
             fn: render,
@@ -45,6 +46,7 @@ export default class Game {
     handleTick(ts) {
         if(this.IsRunning) {
             let delta = (ts - this.Tick.LastTimestamp) / 1000;
+            this.Tick.LastDelta = delta;
 
             if(this.Tick.fn) {
                 this.Tick.fn.call(this, delta);

@@ -10,7 +10,7 @@ export default class PhysicsManager extends Manager {
         this.Constants = {
             PROJECTILE: 1000,
             JUMP: -800,
-            GRAVITY: 2000
+            GRAVITY: 16
         };
     }
 
@@ -23,8 +23,51 @@ export default class PhysicsManager extends Manager {
 
     applyGravity(dt, entity) {
         if(entity.HasGravity) {
-            entity.Vy += this.Constants.GRAVITY * dt;
+            entity.Vy += this.Constants.GRAVITY;
         }
+    }
+
+    calcForces(from, to) {
+        let mt = from.Model.Mass + to.Model.Mass;
+
+        let dxf = -((to.Model.Mass / mt) * to.Vx),
+            dyf = -((to.Model.Mass / mt) * to.Vy);
+        let dxt = -((from.Model.Mass / mt) * from.Vx),
+            dyt = -((from.Model.Mass / mt) * from.Vy);
+
+        if(from.Model.Mass === Infinity) {
+            dxt = 0;
+            dyt = 0;
+
+            to.Vx = -to.Vx;
+            to.Vy = -to.Vy;
+
+            this.updatePosition(this.Game.Tick.LastDelta, to);
+        }
+        if(to.Model.Mass === Infinity) {
+            dxf = 0;
+            dyf = 0;
+            
+            from.Vx = -from.Vx;
+            from.Vy = -from.Vy;
+
+            this.updatePosition(this.Game.Tick.LastDelta, from);
+        }
+
+        // console.log("=========== START ==========");
+        // console.log([ from.Model.Mass, to.Model.Mass, from.Model.Mass + to.Model.Mass ], [ dxf, dyf, dxt, dyt ]);
+        
+        // console.log([ from.Vx, from.Vy ], [ from.Vx + dxf, from.Vy + dyf ]);
+        // console.log([ to.Vx, to.Vy ], [ to.Vx + dxt, to.Vy + dyt ]);
+
+        from.Vx = dxf;
+        from.Vy = dyf;
+        to.Vx = dxt;
+        to.Vy = dyt;
+
+        // console.log("============ END ===========");
+
+        return this;
     }
 
     // 0-2π from the X axis, with respect to @from

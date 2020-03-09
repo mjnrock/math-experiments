@@ -97,11 +97,11 @@
                 }
             }
 
-            // Game.$.Manager.Entity.register(new SquirrelRPG.Entity.Ninja(300, Canvas.get().height - 400));
-            // Game.$.Manager.Entity.register(new SquirrelRPG.Entity.Ninja(250, Canvas.get().height - 400));
-            // Game.$.Manager.Entity.register(new SquirrelRPG.Entity.Ninja(175, Canvas.get().height - 400));
-            // Game.$.Manager.Entity.register(new SquirrelRPG.Entity.Ninja(100, Canvas.get().height - 400));
-            // Game.$.Manager.Entity.register(new SquirrelRPG.Entity.Ninja(50, Canvas.get().height - 400));
+            Game.$.Manager.Entity.register(new SquirrelRPG.Entity.Ninja(300, Canvas.get().height - 400));
+            Game.$.Manager.Entity.register(new SquirrelRPG.Entity.Ninja(250, Canvas.get().height - 400));
+            Game.$.Manager.Entity.register(new SquirrelRPG.Entity.Ninja(175, Canvas.get().height - 400));
+            Game.$.Manager.Entity.register(new SquirrelRPG.Entity.Ninja(100, Canvas.get().height - 400));
+            Game.$.Manager.Entity.register(new SquirrelRPG.Entity.Ninja(50, Canvas.get().height - 400));
 
             // let terr1 = new SquirrelRPG.Entity.Terrain(0, Canvas.get().height - 300);
             // terr1.Model.Width = 800;
@@ -116,70 +116,77 @@
             // terr3.Model.Height = 20;
             // Game.$.Manager.Entity.register(terr3);
 
+            // Game.$.Manager.Collision.add([
+            //         SquirrelRPG.Entity.Projectile
+            //     ], [
+            //         SquirrelRPG.Entity.Creature,
+            //         SquirrelRPG.Entity.Terrain
+            //     ],
+            //     (from, to) => {
+            //         let _this = Game.$.Manager.Entity;
+
+            //         _this.register(new SquirrelRPG.Entity.Effect(SquirrelRPG.Enum.Effect.POOF, to.X, to.Y));
+            //         from.kill();
+            //         to.kill();
+            //     }
+            // );
             Game.$.Manager.Collision.add([
-                    SquirrelRPG.Entity.Projectile
                 ], [
-                    SquirrelRPG.Entity.Creature,
-                    SquirrelRPG.Entity.Terrain
                 ],
                 (from, to) => {
-                    let _this = Game.$.Manager.Entity;
-
-                    _this.register(new SquirrelRPG.Entity.Effect(SquirrelRPG.Enum.Effect.POOF, to.X, to.Y));
-                    from.kill();
-                    to.kill();
+                    Game.$.Manager.Physics.calcForces(from, to);
                 }
             );
-            Game.$.Manager.Collision.add([
-                    SquirrelRPG.Entity.Creature
-                ], [
-                    SquirrelRPG.Entity.Terrain
-                ],
-                (from, to) => {
-                    let f = from.Model.getAABB(true),
-                        t = to.Model.getAABB(true),
-                        dir = Game.$.Manager.Physics.calcDirection(from, to);
+            // Game.$.Manager.Collision.add([
+            //         SquirrelRPG.Entity.Creature
+            //     ], [
+            //         SquirrelRPG.Entity.Terrain
+            //     ],
+            //     (from, to) => {
+            //         let f = from.Model.getAABB(true),
+            //             t = to.Model.getAABB(true),
+            //             dir = Game.$.Manager.Physics.calcDirection(from, to);
 
-                    Game.$.Manager.Physics.collisionBump(dir.major, from, to);
+            //         Game.$.Manager.Physics.collisionBump(dir.major, from, to);
 
-                    // "Walking" Collision (i.e Right-to-Left)
-                    // if(from.Vx < 0) {
-                    //     if(from.Model instanceof SquirrelRPG.Model.Rectangle) {
-                    //         from.X = t.x0 + t.w;
-                    //     } else if(from.Model instanceof SquirrelRPG.Model.Circle) {
-                    //         from.X = t.x0 + from.Model.Radius;
-                    //     }
-                    //     from.Vx = 0;
-                    // }
-                    // if(from.Vx > 0) {
-                    //     console.log(2)
-                    //     if(from.Model instanceof SquirrelRPG.Model.Rectangle) {
-                    //         from.X = t.x0 - f.w;
-                    //     } else if(from.Model instanceof SquirrelRPG.Model.Circle) {
-                    //         from.X = t.x0 + from.Model.Radius;
-                    //     }
-                    //     from.Vx = 0;
-                    // }
-                    // "Falling" Collision (i.e Bottom-to-Top)
-                    // if(from.Vy > 0 && f.y1 >= t.y0 && f.y0 < t.y0) {  // 10 is a +/- error margin (Entities would occassionally fall through world)
-                    //     if(from.Model instanceof SquirrelRPG.Model.Rectangle) {
-                    //         from.Y = t.y0 - f.h;
-                    //     } else if(from.Model instanceof SquirrelRPG.Model.Circle) {
-                    //         from.Y = t.y0 - from.Model.Radius;
-                    //     }
-                    //     from.Vy = 0;
-                    // } 
-                    // // "Jumping" Collision (i.e Top-to-Bottom)
-                    // if(from.Vy < 0) {
-                    //     if(from.Model instanceof SquirrelRPG.Model.Rectangle) {
-                    //         from.Y = t.y1;
-                    //     } else if(from.Model instanceof SquirrelRPG.Model.Circle) {
-                    //         from.Y = t.y1 + from.Model.Radius;
-                    //     }
-                    //     from.Vy = -1;
-                    // }
-                }
-            );
+            //         // "Walking" Collision (i.e Right-to-Left)
+            //         // if(from.Vx < 0) {
+            //         //     if(from.Model instanceof SquirrelRPG.Model.Rectangle) {
+            //         //         from.X = t.x0 + t.w;
+            //         //     } else if(from.Model instanceof SquirrelRPG.Model.Circle) {
+            //         //         from.X = t.x0 + from.Model.Radius;
+            //         //     }
+            //         //     from.Vx = 0;
+            //         // }
+            //         // if(from.Vx > 0) {
+            //         //     console.log(2)
+            //         //     if(from.Model instanceof SquirrelRPG.Model.Rectangle) {
+            //         //         from.X = t.x0 - f.w;
+            //         //     } else if(from.Model instanceof SquirrelRPG.Model.Circle) {
+            //         //         from.X = t.x0 + from.Model.Radius;
+            //         //     }
+            //         //     from.Vx = 0;
+            //         // }
+            //         // "Falling" Collision (i.e Bottom-to-Top)
+            //         // if(from.Vy > 0 && f.y1 >= t.y0 && f.y0 < t.y0) {  // 10 is a +/- error margin (Entities would occassionally fall through world)
+            //         //     if(from.Model instanceof SquirrelRPG.Model.Rectangle) {
+            //         //         from.Y = t.y0 - f.h;
+            //         //     } else if(from.Model instanceof SquirrelRPG.Model.Circle) {
+            //         //         from.Y = t.y0 - from.Model.Radius;
+            //         //     }
+            //         //     from.Vy = 0;
+            //         // } 
+            //         // // "Jumping" Collision (i.e Top-to-Bottom)
+            //         // if(from.Vy < 0) {
+            //         //     if(from.Model instanceof SquirrelRPG.Model.Rectangle) {
+            //         //         from.Y = t.y1;
+            //         //     } else if(from.Model instanceof SquirrelRPG.Model.Circle) {
+            //         //         from.Y = t.y1 + from.Model.Radius;
+            //         //     }
+            //         //     from.Vy = -1;
+            //         // }
+            //     }
+            // );
 
             Canvas.loadImages([
                 [ "skwrl-01", "./assets/skwrl-01.png" ],

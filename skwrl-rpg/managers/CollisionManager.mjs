@@ -46,7 +46,7 @@ export default class CollisionManager extends Manager {
                 }
             }
 
-            if((entFrom.length === 0 || cfrom) && (entTo.length === 0 || cto)) {
+            if((from.length === 0 || cfrom) && (to.length === 0 || cto)) {
                 handler(entFrom, entTo, this.Game, this.Window);
             }
         });
