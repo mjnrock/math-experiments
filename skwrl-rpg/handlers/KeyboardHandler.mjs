@@ -108,7 +108,8 @@ export default class KeyboardHandler extends DOMHandler {
 
         this.updateStateMask(e);
 
-        if(this.Game.$.Manager.Entity.MainPlayer.Vy === 0 && this.hasJump()) {
+        if(this.Game.$.Manager.Entity.MainPlayer.IsFlying === false && this.hasJump()) {
+            this.Game.$.Manager.Entity.MainPlayer.IsFlying = true;
             this.Game.$.Manager.Entity.MainPlayer.Vy = this.Game.$.Manager.Physics.Constants.JUMP;
         }
 
@@ -142,8 +143,6 @@ export default class KeyboardHandler extends DOMHandler {
         let dir = this.Game.$.Handler.Keyboard.hasLeft() ? -1 : 1;
         if(this.Game.$.Handler.Keyboard.hasLeft() || this.Game.$.Handler.Keyboard.hasRight()) {
             this.Game.$.Manager.Entity.MainPlayer.Vx = dir * 350;
-        } else {
-            this.Game.$.Manager.Entity.MainPlayer.Vx = 0;
         }
         // if(this.Game.$.Handler.Keyboard.hasRight()) {
         //     // this.Game.$.Manager.Entity.MainPlayer.X += 10;

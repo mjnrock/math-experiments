@@ -144,6 +144,10 @@
                 (from, to) => {
                     let dir = Game.$.Manager.Physics.calcDirection(from, to);
                     Game.$.Manager.Physics.collisionBump(dir, from, to);
+
+                    if(SquirrelRPG.Lib.Bitwise.has(dir.minor, SquirrelRPG.Enum.Direction.SOUTH)) {
+                        from.IsFlying = false;
+                    }
                 }
             );
             Game.$.Manager.Collision.add([

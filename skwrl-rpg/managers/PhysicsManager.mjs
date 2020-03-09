@@ -30,10 +30,10 @@ export default class PhysicsManager extends Manager {
     calcForces(from, to) {
         let mt = from.Model.Mass + to.Model.Mass;
 
-        let dxf = -((to.Model.Mass / mt) * to.Vx),
-            dyf = -((to.Model.Mass / mt) * to.Vy);
-        let dxt = -((from.Model.Mass / mt) * from.Vx),
-            dyt = -((from.Model.Mass / mt) * from.Vy);
+        let dxf = (to.Model.Mass / mt) * -to.Vx,
+            dyf = (to.Model.Mass / mt) * -to.Vy;
+        let dxt = (from.Model.Mass / mt) * -from.Vx,
+            dyt = (from.Model.Mass / mt) * -from.Vy;
 
         if(from.Model.Mass === Infinity) {
             dxt = 0;
@@ -146,26 +146,26 @@ export default class PhysicsManager extends Manager {
             from.Vy = 0;
         }
         // if(Bitwise.has(direction.major, Enum.Direction.EAST)) {
-        if(direction.degrees <= 44 || direction.degrees >= 316) {
+        if(direction.degrees <= 40 || direction.degrees >= 320) {
             let xn;
             if(from.Model instanceof Model.Rectangle) {
                 xn = t.x0 - f.w;
             } else if(from.Model instanceof Model.Circle) {
                 xn = t.x0 - from.Model.Radius;
             }
-            from.X = Math.min(from.X - 1, xn);
-            from.Vx = 0;
+            from.X = Math.min(from.X, xn);
+            // from.Vx = 0;
         }
         // if(Bitwise.has(direction.major, Enum.Direction.WEST)) {
-        if(direction.degrees >= 136 && direction.degrees <= 224) {
+        if(direction.degrees >= 140 && direction.degrees <= 220) {
             let xn;
             if(from.Model instanceof Model.Rectangle) {
                 xn = t.x1;
             } else if(from.Model instanceof Model.Circle) {
                 xn = t.x1 + from.Model.Radius;
             }
-            from.X = Math.max(from.X + 1, xn);
-            from.Vx = 0;
+            from.X = Math.max(from.X, xn);
+            // from.Vx = 0;
         }
     }
 
