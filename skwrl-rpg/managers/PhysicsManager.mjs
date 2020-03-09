@@ -55,6 +55,9 @@ export default class PhysicsManager extends Manager {
         to.Vx = dxt;
         to.Vy = dyt;
 
+        this.updatePosition(from, this.Game.Tick.LastDelta);
+        this.updatePosition(to, this.Game.Tick.LastDelta);
+
         // console.log("============ END ===========");
 
         return this;
