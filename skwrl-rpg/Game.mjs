@@ -6,7 +6,7 @@ export default class Game {
         this.Tick = {
             fn: tick,
             Interval: null,
-            FPS: 30,
+            FPS: 24,
             LastTimestamp: Date.now()
         };
         this.Render = {
@@ -62,6 +62,9 @@ export default class Game {
             }
 
             this.Render.LastTimestamp = ts;
+
+            this.Canvas.text(`FPS: ${ (this.Tick.FPS).toFixed(2) }`, this.Canvas.get().width / 2, 30, { color: "#000"});
+            this.Canvas.text(`RPS: ${ (1000 / (delta * 1000)).toFixed(2) }`, this.Canvas.get().width / 2, 50, { color: "#000"});
             
             window.requestAnimationFrame(this.handleRender.bind(this));
         }

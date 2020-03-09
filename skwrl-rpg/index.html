@@ -80,39 +80,54 @@
 
             let skwrl = new SquirrelRPG.Entity.Squirrel(...Canvas.getCenterPoint(), `Mr. FuzzyBottoms`);
             //TODO Square box works with Terrain, Cricle does with bugs ("jump up" problem, non-active collision with Terrain)
-            skwrl.Model = new SquirrelRPG.Model.Rectangle(skwrl.X, skwrl.Y, 32, 32);
+            skwrl.Model = new SquirrelRPG.Model.Rectangle(skwrl.X, skwrl.Y, 48, 48);
             Game.$.Manager.Entity.setMainPlayer(skwrl);
 
-            Game.$.Manager.Entity.register(new SquirrelRPG.Entity.Ninja(300, Canvas.get().height - 400));
-            Game.$.Manager.Entity.register(new SquirrelRPG.Entity.Ninja(250, Canvas.get().height - 400));
-            Game.$.Manager.Entity.register(new SquirrelRPG.Entity.Ninja(175, Canvas.get().height - 400));
-            Game.$.Manager.Entity.register(new SquirrelRPG.Entity.Ninja(100, Canvas.get().height - 400));
-            Game.$.Manager.Entity.register(new SquirrelRPG.Entity.Ninja(50, Canvas.get().height - 400));
+            let tileSizeW = 32,
+                tileSizeH = 20;
+            for(let x = 0; x < 50; x++) {
+                for(let y = 0; y < 10; y++) {
+                    let terr = new SquirrelRPG.Entity.Terrain(
+                        x * tileSizeW,
+                        Canvas.get().height - y * tileSizeH
+                    );
+                    terr.Model.Width = tileSizeW;
+                    terr.Model.Height = tileSizeH;
+                    Game.$.Manager.Entity.register(terr);
+                }
+            }
 
-            let terr1 = new SquirrelRPG.Entity.Terrain(0, Canvas.get().height - 300);
-            terr1.Model.Width = 800;
-            terr1.Model.Height = 20;
-            Game.$.Manager.Entity.register(terr1);
-            let terr2 = new SquirrelRPG.Entity.Terrain(500, Canvas.get().height - 480);
-            terr2.Model.Width = 200;
-            terr2.Model.Height = 20;
-            Game.$.Manager.Entity.register(terr2);
-            let terr3 = new SquirrelRPG.Entity.Terrain(300, Canvas.get().height - 200);
-            terr3.Model.Width = 800;
-            terr3.Model.Height = 20;
-            Game.$.Manager.Entity.register(terr3);
+            // Game.$.Manager.Entity.register(new SquirrelRPG.Entity.Ninja(300, Canvas.get().height - 400));
+            // Game.$.Manager.Entity.register(new SquirrelRPG.Entity.Ninja(250, Canvas.get().height - 400));
+            // Game.$.Manager.Entity.register(new SquirrelRPG.Entity.Ninja(175, Canvas.get().height - 400));
+            // Game.$.Manager.Entity.register(new SquirrelRPG.Entity.Ninja(100, Canvas.get().height - 400));
+            // Game.$.Manager.Entity.register(new SquirrelRPG.Entity.Ninja(50, Canvas.get().height - 400));
+
+            // let terr1 = new SquirrelRPG.Entity.Terrain(0, Canvas.get().height - 300);
+            // terr1.Model.Width = 800;
+            // terr1.Model.Height = 20;
+            // Game.$.Manager.Entity.register(terr1);
+            // let terr2 = new SquirrelRPG.Entity.Terrain(500, Canvas.get().height - 480);
+            // terr2.Model.Width = 200;
+            // terr2.Model.Height = 20;
+            // Game.$.Manager.Entity.register(terr2);
+            // let terr3 = new SquirrelRPG.Entity.Terrain(300, Canvas.get().height - 200);
+            // terr3.Model.Width = 800;
+            // terr3.Model.Height = 20;
+            // Game.$.Manager.Entity.register(terr3);
 
             Game.$.Manager.Collision.add([
                     SquirrelRPG.Entity.Projectile
                 ], [
-                    SquirrelRPG.Entity.Creature
+                    SquirrelRPG.Entity.Creature,
+                    SquirrelRPG.Entity.Terrain
                 ],
                 (from, to) => {
                     let _this = Game.$.Manager.Entity;
 
                     _this.register(new SquirrelRPG.Entity.Effect(SquirrelRPG.Enum.Effect.POOF, to.X, to.Y));
-                    _this.unregister(from);
-                    _this.unregister(to);
+                    from.kill();
+                    to.kill();
                 }
             );
             Game.$.Manager.Collision.add([
@@ -122,26 +137,47 @@
                 ],
                 (from, to) => {
                     let f = from.Model.getAABB(true),
-                        t = to.Model.getAABB(true);
+                        t = to.Model.getAABB(true),
+                        dir = Game.$.Manager.Physics.calcDirection(from, to);
 
+                    Game.$.Manager.Physics.collisionBump(dir.major, from, to);
+
+                    // "Walking" Collision (i.e Right-to-Left)
+                    // if(from.Vx < 0) {
+                    //     if(from.Model instanceof SquirrelRPG.Model.Rectangle) {
+                    //         from.X = t.x0 + t.w;
+                    //     } else if(from.Model instanceof SquirrelRPG.Model.Circle) {
+                    //         from.X = t.x0 + from.Model.Radius;
+                    //     }
+                    //     from.Vx = 0;
+                    // }
+                    // if(from.Vx > 0) {
+                    //     console.log(2)
+                    //     if(from.Model instanceof SquirrelRPG.Model.Rectangle) {
+                    //         from.X = t.x0 - f.w;
+                    //     } else if(from.Model instanceof SquirrelRPG.Model.Circle) {
+                    //         from.X = t.x0 + from.Model.Radius;
+                    //     }
+                    //     from.Vx = 0;
+                    // }
                     // "Falling" Collision (i.e Bottom-to-Top)
-                    if(from.Vy > 0 && f.y1 >= t.y0 && f.y0 < t.y0) {  // 10 is a +/- error margin (Entities would occassionally fall through world)
-                        if(from.Model instanceof SquirrelRPG.Model.Rectangle) {
-                            from.Y = t.y0 - f.h;
-                        } else if(from.Model instanceof SquirrelRPG.Model.Circle) {
-                            from.Y = t.y0 - from.Model.Radius;
-                        }
-                        from.Vy = 0;
-                    } 
-                    // "Jumping" Collision (i.e Top-to-Bottom)
-                    if(from.Vy < 0) {
-                        if(from.Model instanceof SquirrelRPG.Model.Rectangle) {
-                            from.Y = t.y1;
-                        } else if(from.Model instanceof SquirrelRPG.Model.Circle) {
-                            from.Y = t.y1 + from.Model.Radius;
-                        }
-                        from.Vy = -1;
-                    }
+                    // if(from.Vy > 0 && f.y1 >= t.y0 && f.y0 < t.y0) {  // 10 is a +/- error margin (Entities would occassionally fall through world)
+                    //     if(from.Model instanceof SquirrelRPG.Model.Rectangle) {
+                    //         from.Y = t.y0 - f.h;
+                    //     } else if(from.Model instanceof SquirrelRPG.Model.Circle) {
+                    //         from.Y = t.y0 - from.Model.Radius;
+                    //     }
+                    //     from.Vy = 0;
+                    // } 
+                    // // "Jumping" Collision (i.e Top-to-Bottom)
+                    // if(from.Vy < 0) {
+                    //     if(from.Model instanceof SquirrelRPG.Model.Rectangle) {
+                    //         from.Y = t.y1;
+                    //     } else if(from.Model instanceof SquirrelRPG.Model.Circle) {
+                    //         from.Y = t.y1 + from.Model.Radius;
+                    //     }
+                    //     from.Vy = -1;
+                    // }
                 }
             );
 

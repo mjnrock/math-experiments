@@ -137,14 +137,22 @@ export default class KeyboardHandler extends DOMHandler {
 
     onTick(ts) {
         //* Move the Main Player if there is Keyboard input
-        if(this.Game.$.Handler.Keyboard.hasRight()) {
-            this.Game.$.Manager.Entity.MainPlayer.X += 10;
-            // this.Game.$.Manager.Entity.MainPlayer.Direction = 1;
+        let dir = this.Game.$.Handler.Keyboard.hasLeft() ? -1 : 1;
+        if(this.Game.$.Handler.Keyboard.hasLeft() || this.Game.$.Handler.Keyboard.hasRight()) {
+            this.Game.$.Manager.Entity.MainPlayer.Vx = dir * 350;
+        } else {
+            this.Game.$.Manager.Entity.MainPlayer.Vx = 0;
         }
-        if(this.Game.$.Handler.Keyboard.hasLeft()) {
-            this.Game.$.Manager.Entity.MainPlayer.X -= 10;
-            // this.Game.$.Manager.Entity.MainPlayer.Direction = -1;
-        }
+        // if(this.Game.$.Handler.Keyboard.hasRight()) {
+        //     // this.Game.$.Manager.Entity.MainPlayer.X += 10;
+        //     this.Game.$.Manager.Entity.MainPlayer.Vx = 350;
+        //     // this.Game.$.Manager.Entity.MainPlayer.Direction = 1;
+        // }
+        // if(this.Game.$.Handler.Keyboard.hasLeft()) {
+        //     // this.Game.$.Manager.Entity.MainPlayer.X -= 10;
+        //     this.Game.$.Manager.Entity.MainPlayer.Vx = -350;
+        //     // this.Game.$.Manager.Entity.MainPlayer.Direction = -1;
+        // }
         // if(this.Game.$.Handler.Keyboard.hasDown()) {
         //     this.Game.$.Manager.Entity.MainPlayer.Y += 10;
         // }

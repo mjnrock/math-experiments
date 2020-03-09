@@ -52,22 +52,26 @@ export default class EntityManager extends Manager {
         const Entities = Object.values(this.Entities);
 
         Entities.forEach(ent => {
-            //? Lifecycle checks
-            if(ent instanceof Entity.Projectile) {
-                if(ent.X < 0 || ent.X > this.Game.Canvas.get().width || ent.Y < 0 || ent.Y > this.Game.Canvas.get().height) {
-                    ent.kill();
+            if(ent instanceof Entity.Terrain) {
+                // NOOP
+            } else {
+                //? Lifecycle checks
+                if(ent instanceof Entity.Projectile) {
+                    if(ent.X < 0 || ent.X > this.Game.Canvas.get().width || ent.Y < 0 || ent.Y > this.Game.Canvas.get().height) {
+                        ent.kill();
+                    }
                 }
+
+                //? Physics checks
+                this.Game.$.Manager.Physics.applyGravity(dt, ent);
+                this.Game.$.Manager.Physics.updatePosition(dt, ent);
+
+
+                //? Collision checks
+                Entities.forEach(tar => {
+                    this.Game.$.Manager.Collision.checkCollision(ent, tar);
+                });
             }
-
-            //? Physics checks
-            this.Game.$.Manager.Physics.applyGravity(dt, ent);
-            this.Game.$.Manager.Physics.updatePosition(dt, ent);
-
-
-            //? Collision checks
-            Entities.forEach(tar => {
-                this.Game.$.Manager.Collision.checkCollision(ent, tar);
-            });
 
 
             //? Live or Die checks
@@ -85,8 +89,8 @@ export default class EntityManager extends Manager {
         // DEBUG
         let playerHasCollision = false;
 
-        Object.values(this.Entities).forEach(ent => {            
-            if(ent === this.Game.$.Manager.Entity.MainPlayer) {                
+        Object.values(this.Entities).forEach(ent => {
+            if(ent === this.Game.$.Manager.Entity.MainPlayer) {
                 //? This state management here is just for testing
                 let state = this.Game.$.Handler.Mouse.hasLeft() ? "ATTACKING" : "NORMAL",
                     tileRow = 0,
