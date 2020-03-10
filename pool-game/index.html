@@ -67,10 +67,57 @@
                 }
             );
             
+            Game.register("Manager", {
+                Entity: new Billiards.Manager.EntityManager(Game, window),
+                Collision: new Billiards.Manager.CollisionManager(Game, window),
+                Physics: new Billiards.Manager.PhysicsManager(Game, window),
+            });
             Game.register("Handler", {
                 Keyboard: new Billiards.Handler.KeyboardHandler(Game, window),
                 Mouse: new Billiards.Handler.MouseHandler(Game, window),
             });
+
+            let w = 1000,
+                h = 500,
+                r = 20;
+            Game.$.Manager.Entity.register(new Billiards.Entity.Table(100, 100, w, h));
+
+            Game.$.Manager.Entity.register(new Billiards.Entity.Bumper(100, 100 - r, w / 2, r));
+            Game.$.Manager.Entity.register(new Billiards.Entity.Bumper(100 + w / 2, 100 - r, w / 2, r));
+            Game.$.Manager.Entity.register(new Billiards.Entity.Bumper(100, 100 + h, w / 2, r));
+            Game.$.Manager.Entity.register(new Billiards.Entity.Bumper(100 + w / 2, 100 + h, w / 2, r));
+            Game.$.Manager.Entity.register(new Billiards.Entity.Bumper(100 - r, 100, r, h));
+            Game.$.Manager.Entity.register(new Billiards.Entity.Bumper(100 + w, 100, r, h));
+
+            Game.$.Manager.Entity.register(new Billiards.Entity.Pocket(100, 100));
+            Game.$.Manager.Entity.register(new Billiards.Entity.Pocket(100, 100 + h));
+            Game.$.Manager.Entity.register(new Billiards.Entity.Pocket(100 + w / 2, 100));
+            Game.$.Manager.Entity.register(new Billiards.Entity.Pocket(100 + w / 2, 100 + h));
+            Game.$.Manager.Entity.register(new Billiards.Entity.Pocket(100 + w, 100));
+            Game.$.Manager.Entity.register(new Billiards.Entity.Pocket(100 + w, 100 + h));
+
+            let ball = new Billiards.Entity.Ball(500, 300);
+            // ball.Vx = 0;
+            // ball.Vy = 500;
+            ball.Vx = 400;
+            ball.Vy = 500;
+            Game.$.Manager.Entity.register(ball);
+            
+            let cue = new Billiards.Entity.Cue(200, 200, w, h);
+            Game._.addPlayer(cue);
+            Game.$.Manager.Entity.register(cue);
+            
+            Game.$.Manager.Collision.add([
+                    Billiards.Entity.Ball
+                ], [
+                    Billiards.Entity.Bumper
+                ],
+                (from, to) => {
+                    Game.$.Manager.Physics.updateMomentum(from, to);
+                }
+            );
+
+            Game.Play();
         </script>
     </body>
 </html>

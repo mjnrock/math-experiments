@@ -121,7 +121,7 @@ export default class KeyboardHandler extends DOMHandler {
         if(e.which === 114) {   // F3
             this._isDebugMode = !this._isDebugMode;
         } else if(e.which === 116) {    // F5
-            window.location.reload(false);
+            window.location.reload(true);
         }
 
         this.updateStateMask(e);

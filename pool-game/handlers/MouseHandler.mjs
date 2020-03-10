@@ -95,7 +95,11 @@ export default class MouseHandler extends DOMHandler {
     onMouseMove(e) {
         e.preventDefault();
 
-        let [ mx, my ] = this.getMousePosition(e);
+        let [ mx, my ] = this.getMousePosition(e),
+            player = this.Game._.getPlayer();
+
+        player.X = mx;
+        player.Y = my - player.Model.Height / 2;
 
         if(this.Handlers.onMouseMove) {
             this.Handlers.onMouseMove.call(this, e);

@@ -52,7 +52,7 @@ export default class CollisionManager extends Manager {
     }
 
     checkCollision(entFrom, entTo) {
-        if(entFrom !== entTo && entTo.IsCollidable && entFrom.Model.isCollision(entTo.Model)) {
+        if(entFrom !== entTo && entFrom.Model.isCollision(entTo.Model)) {
             this.onCollision(entFrom, entTo);
 
             return true;
